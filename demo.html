@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>裂变免单助手 - Demo演示</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @keyframes bounce-slow {
+            0%, 100% { transform: translateY(-5%); }
+            50% { transform: translateY(0); }
+        }
+        .animate-bounce-slow { animation: bounce-slow 2s infinite; }
+        .glass { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); }
+        .red-pocket { background: linear-gradient(180deg, #ff5f5f 0%, #d41414 100%); }
+    </style>
+</head>
+<body class="bg-gray-100 font-sans">
+
+    <!-- 模拟手机壳容器 -->
+    <div class="max-w-md mx-auto bg-white min-h-screen shadow-2xl relative overflow-hidden">
+        
+        <!-- 状态栏模拟 -->
+        <div class="h-6 bg-white flex justify-between items-center px-4 pt-2">
+            <span class="text-xs font-bold">12:00</span>
+            <div class="flex space-x-1">
+                <div class="w-3 h-3 bg-gray-400 rounded-full"></div>
+                <div class="w-3 h-3 bg-gray-400 rounded-full"></div>
+            </div>
+        </div>
+
+        <!-- 顶部通知轮播 -->
+        <div class="bg-orange-50 px-4 py-2">
+            <p class="text-orange-600 text-xs animate-pulse">🔥 用户 张** 刚刚完成邀请，已获得 99元 全额返现！</p>
+        </div>
+
+        <!-- 产品详情 -->
+        <div class="p-4">
+            <div class="rounded-xl overflow-hidden shadow-lg mb-4">
+                <img src="https://images.unsplash.com/photo-1520333781090-e2ad16ba8e82?auto=format&fit=crop&w=800&q=80" alt="洗车服务" class="w-full h-48 object-cover">
+            </div>
+            <h1 class="text-xl font-bold text-gray-800">精选全自动无损洗车服务</h1>
+            <p class="text-gray-500 text-sm mt-1">原价：￥99 | 累计已有 1,284 人免单成功</p>
+            <div class="mt-4 flex items-baseline">
+                <span class="text-2xl font-bold text-red-500 font-mono">￥99.00</span>
+                <span class="ml-2 text-xs text-white bg-red-500 px-2 py-0.5 rounded-full">推三免一</span>
+            </div>
+        </div>
+
+        <!-- 核心任务区 -->
+        <div class="mx-4 p-6 bg-gray-50 rounded-2xl border-2 border-dashed border-gray-200">
+            <h2 class="text-center font-bold text-gray-700 mb-6">我的免单进度</h2>
+            
+            <div class="flex justify-around items-center mb-8">
+                <!-- A: 楼主 -->
+                <div class="flex flex-col items-center">
+                    <div class="w-14 h-14 rounded-full border-2 border-orange-500 p-0.5 relative">
+                        <img src="https://i.pravatar.cc/150?u=me" class="rounded-full">
+                        <span class="absolute -bottom-2 bg-orange-500 text-white text-[10px] px-2 rounded-full">发起人</span>
+                    </div>
+                    <span class="text-xs mt-3 text-gray-400">我</span>
+                </div>
+
+                <!-- B: 已下单 -->
+                <div class="flex flex-col items-center">
+                    <div class="w-14 h-14 rounded-full border-2 border-green-500 p-0.5 relative bg-white">
+                        <img src="https://i.pravatar.cc/150?u=friend1" class="rounded-full">
+                        <div class="absolute -top-1 -right-1 bg-green-500 rounded-full p-1 shadow">
+                            <svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+                        </div>
+                    </div>
+                    <span class="text-xs mt-3 text-green-600 font-bold">已下单</span>
+                </div>
+
+                <!-- C: 待邀请 -->
+                <div class="flex flex-col items-center opacity-40">
+                    <div class="w-14 h-14 rounded-full border-2 border-gray-300 border-dashed flex items-center justify-center bg-gray-100">
+                        <span class="text-2xl text-gray-400">+</span>
+                    </div>
+                    <span class="text-xs mt-3 text-gray-400">待邀请</span>
+                </div>
+
+                <!-- D: 待邀请 -->
+                <div class="flex flex-col items-center opacity-40">
+                    <div class="w-14 h-14 rounded-full border-2 border-gray-300 border-dashed flex items-center justify-center bg-gray-100">
+                        <span class="text-2xl text-gray-400">+</span>
+                    </div>
+                    <span class="text-xs mt-3 text-gray-400">待邀请</span>
+                </div>
+            </div>
+
+            <button onclick="showSuccess()" class="w-full bg-red-500 hover:bg-red-600 text-white font-bold py-4 rounded-xl shadow-lg transition-all active:scale-95 animate-bounce-slow">
+                立即分享，还差 2 人免单
+            </button>
+        </div>
+
+        <!-- 商家背书 -->
+        <div class="p-8 text-center text-gray-400 text-xs">
+            本活动由 [XX洗车连锁中心] 与 [XX技术] 联合提供<br>
+            支付资金受微信支付监管，安全有保障
+        </div>
+
+        <!-- 【核心演示：返现成功弹窗】 -->
+        <div id="successModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-6 glass">
+            <div class="red-pocket w-full max-w-xs rounded-3xl p-8 text-center shadow-2xl transform transition-all">
+                <div class="w-20 h-20 bg-yellow-400 rounded-full mx-auto flex items-center justify-center mb-4 shadow-inner border-4 border-yellow-200">
+                    <span class="text-4xl text-red-600 font-bold">￥</span>
+                </div>
+                <h3 class="text-white text-2xl font-bold mb-2">恭喜！任务达成</h3>
+                <p class="text-red-100 text-sm mb-6">您购买的产品已由系统执行<br><b class="text-yellow-300">全额原路退款</b></p>
+                
+                <div class="bg-white/10 rounded-xl p-4 mb-6">
+                    <div class="flex justify-between text-xs text-red-100 mb-1">
+                        <span>退款金额</span>
+                        <span class="font-bold text-white">￥99.00</span>
+                    </div>
+                    <div class="flex justify-between text-xs text-red-100">
+                        <span>到账账户</span>
+                        <span class="font-bold text-white">微信零钱</span>
+                    </div>
+                </div>
+
+                <button onclick="closeModal()" class="w-full bg-yellow-400 text-red-700 font-bold py-3 rounded-full shadow-lg hover:bg-yellow-300">
+                    查看详情
+                </button>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        function showSuccess() {
+            document.getElementById('successModal').classList.remove('hidden');
+        }
+        function closeModal() {
+            document.getElementById('successModal').classList.add('hidden');
+            alert('模拟功能：您的技术服务费(5%)已同步自动划扣至您的账户！');
+        }
+    </script>
+</body>
+</html>
