@@ -1,141 +1,2025 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>裂变免单助手 - Demo演示</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        @keyframes bounce-slow {
-            0%, 100% { transform: translateY(-5%); }
-            50% { transform: translateY(0); }
-        }
-        .animate-bounce-slow { animation: bounce-slow 2s infinite; }
-        .glass { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); }
-        .red-pocket { background: linear-gradient(180deg, #ff5f5f 0%, #d41414 100%); }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>推三免一商城小程序 · 完整版</title>
+<style>
+/* ===== RESET & ROOT ===== */
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  --red:#D32F2F;--red2:#E53935;--red-light:#FFEBEE;--red-dark:#B71C1C;
+  --orange:#E65100;--orange2:#FF6D00;
+  --green:#2E7D32;--green2:#388E3C;--green-light:#E8F5E9;
+  --blue:#1565C0;--blue-light:#E3F2FD;
+  --gold:#F9A825;--gold-light:#FFF9C4;
+  --bg:#F0F0F0;--white:#FFFFFF;
+  --text:#212121;--text2:#616161;--text3:#9E9E9E;
+  --border:#E0E0E0;
+  --radius:12px;--radius-sm:8px;
+  --shadow:0 2px 8px rgba(0,0,0,0.10);
+  --shadow-lg:0 8px 32px rgba(0,0,0,0.16);
+}
+html,body{height:100%;background:#1a1a2e;font-family:-apple-system,'PingFang SC','Helvetica Neue',sans-serif}
+
+/* ===== APP FRAME ===== */
+.app-frame{
+  display:flex;align-items:flex-start;justify-content:center;
+  min-height:100vh;padding:24px 16px;gap:32px;flex-wrap:wrap;
+}
+.frame-label{
+  color:rgba(255,255,255,0.5);font-size:11px;text-align:center;
+  margin-top:8px;letter-spacing:1px;text-transform:uppercase;
+}
+
+/* ===== PHONE SHELL ===== */
+.phone{
+  width:375px;background:var(--bg);
+  border-radius:40px;border:8px solid #111;
+  box-shadow:var(--shadow-lg),0 0 0 1px #333;
+  overflow:hidden;display:flex;flex-direction:column;
+  height:780px;position:relative;flex-shrink:0;
+}
+.phone-screen{flex:1;overflow:hidden;display:flex;flex-direction:column}
+.status-bar{
+  background:var(--red);color:#fff;
+  display:flex;justify-content:space-between;align-items:center;
+  padding:8px 18px 5px;font-size:11px;font-weight:600;flex-shrink:0;
+}
+.nav-bar{
+  background:var(--red);color:#fff;
+  display:flex;align-items:center;padding:6px 14px 10px;gap:10px;flex-shrink:0;
+}
+.nav-back{font-size:20px;cursor:pointer;opacity:0.9}
+.nav-title{flex:1;font-size:16px;font-weight:700;letter-spacing:0.3px}
+.nav-right{font-size:18px;cursor:pointer}
+.page-body{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch}
+.page-body::-webkit-scrollbar{display:none}
+
+/* ===== TAB BAR ===== */
+.tab-bar{
+  background:var(--white);border-top:0.5px solid var(--border);
+  display:flex;flex-shrink:0;padding:6px 0 12px;
+}
+.tab-item{
+  flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;
+  font-size:10px;color:var(--text3);cursor:pointer;padding:4px 0;
+  transition:color 0.2s;
+}
+.tab-item.active{color:var(--red)}
+.tab-icon{font-size:22px;line-height:1}
+.tab-badge{
+  position:absolute;top:-3px;right:-5px;background:var(--red);
+  color:#fff;font-size:9px;font-weight:700;padding:1px 4px;
+  border-radius:10px;border:1.5px solid #fff;
+}
+.tab-icon-wrap{position:relative;display:inline-block}
+
+/* ===== PAGES ===== */
+.page{display:none;flex-direction:column;height:100%}
+.page.active{display:flex}
+
+/* ===== COMPONENTS ===== */
+.section{background:var(--white);margin-bottom:8px}
+.section-hd{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:12px 14px 8px;
+}
+.section-title{font-size:14px;font-weight:700;color:var(--text);display:flex;align-items:center;gap:6px}
+.section-more{font-size:12px;color:var(--text3)}
+
+.card{
+  background:var(--white);border-radius:var(--radius);
+  margin:8px;box-shadow:var(--shadow);overflow:hidden;
+}
+.card-header{
+  padding:12px 14px;border-bottom:0.5px solid var(--border);
+  display:flex;align-items:center;gap:8px;
+}
+.card-title{font-size:14px;font-weight:700;color:var(--text)}
+
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;
+  border:none;cursor:pointer;font-size:14px;font-weight:600;
+  padding:10px 20px;border-radius:24px;transition:all 0.2s;
+  font-family:inherit;
+}
+.btn-primary{background:var(--red);color:#fff}
+.btn-primary:active{background:var(--red-dark);transform:scale(0.97)}
+.btn-ghost{background:transparent;color:var(--red);border:1.5px solid var(--red)}
+.btn-sm{padding:6px 14px;font-size:12px;border-radius:16px}
+.btn-green{background:var(--green);color:#fff}
+.btn-block{width:100%;border-radius:var(--radius-sm)}
+
+.badge{
+  display:inline-flex;align-items:center;
+  font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;
+}
+.badge-red{background:var(--red-light);color:var(--red-dark)}
+.badge-green{background:var(--green-light);color:var(--green)}
+.badge-gold{background:var(--gold-light);color:#5D4037}
+.badge-blue{background:var(--blue-light);color:var(--blue)}
+
+.row{display:flex;align-items:center}
+.col{display:flex;flex-direction:column}
+.gap4{gap:4px}.gap8{gap:8px}.gap12{gap:12px}
+.flex1{flex:1}
+.text-red{color:var(--red)}.text-green{color:var(--green)}
+.text-gold{color:var(--gold)}.text-gray{color:var(--text3)}
+.text-sm{font-size:12px}.text-xs{font-size:11px}
+.bold{font-weight:700}.price{font-size:15px;font-weight:800;color:var(--red)}
+.price-lg{font-size:20px;font-weight:800;color:var(--red)}
+.orig-price{font-size:11px;color:var(--text3);text-decoration:line-through}
+.divider{height:0.5px;background:var(--border);margin:0 14px}
+
+/* ===== TOAST ===== */
+#toast{
+  position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);
+  background:rgba(0,0,0,0.78);color:#fff;padding:12px 22px;
+  border-radius:24px;font-size:13px;z-index:9999;display:none;
+  text-align:center;max-width:240px;line-height:1.5;pointer-events:none;
+}
+
+/* ===== MODAL ===== */
+.modal-mask{
+  position:absolute;top:0;left:0;right:0;bottom:0;
+  background:rgba(0,0,0,0.5);z-index:100;display:none;
+  align-items:flex-end;justify-content:center;
+}
+.modal-mask.show{display:flex}
+.modal-box{
+  background:var(--white);border-radius:var(--radius) var(--radius) 0 0;
+  width:100%;max-height:80%;overflow-y:auto;padding:20px;
+}
+.modal-title{font-size:16px;font-weight:700;color:var(--text);margin-bottom:16px;text-align:center}
+.modal-close{position:absolute;top:14px;right:14px;font-size:20px;cursor:pointer;color:var(--text3)}
+
+/* =====================================================
+   PAGE 1: HOME
+===================================================== */
+.home-banner{
+  background:linear-gradient(135deg,var(--red-dark) 0%,var(--red2) 60%,#EF5350 100%);
+  padding:16px;position:relative;overflow:hidden;
+}
+.home-banner::before{
+  content:'';position:absolute;right:-20px;top:-20px;
+  width:120px;height:120px;border-radius:50%;
+  background:rgba(255,255,255,0.08);
+}
+.home-banner::after{
+  content:'';position:absolute;right:20px;bottom:-30px;
+  width:80px;height:80px;border-radius:50%;
+  background:rgba(255,255,255,0.06);
+}
+.banner-tag{
+  display:inline-block;background:var(--gold);
+  color:#5D4037;font-size:10px;font-weight:700;
+  padding:3px 10px;border-radius:20px;margin-bottom:6px;
+}
+.banner-title{color:#fff;font-size:22px;font-weight:800;line-height:1.2;margin-bottom:4px}
+.banner-sub{color:rgba(255,255,255,0.85);font-size:13px;margin-bottom:12px}
+.banner-actions{display:flex;gap:10px}
+.banner-progress{
+  margin-top:14px;background:rgba(255,255,255,0.2);
+  border-radius:10px;height:6px;overflow:hidden;
+}
+.banner-progress-fill{
+  height:100%;background:var(--gold);border-radius:10px;
+  width:33%;transition:width 0.5s;
+}
+.banner-progress-label{color:rgba(255,255,255,0.8);font-size:11px;margin-top:5px}
+
+.notice-bar{
+  background:var(--gold-light);border-bottom:0.5px solid #F9A825;
+  display:flex;align-items:center;gap:8px;padding:7px 14px;overflow:hidden;
+}
+.notice-scroll{flex:1;overflow:hidden;white-space:nowrap;font-size:12px;color:#5D4037}
+.notice-inner{display:inline-block;animation:scrollText 20s linear infinite}
+@keyframes scrollText{0%{transform:translateX(100%)}100%{transform:translateX(-100%)}}
+
+.quick-grid{
+  display:grid;grid-template-columns:repeat(5,1fr);gap:0;
+  background:var(--white);padding:12px 4px;
+}
+.quick-item{
+  display:flex;flex-direction:column;align-items:center;gap:5px;
+  cursor:pointer;padding:4px;
+}
+.quick-icon{
+  width:48px;height:48px;border-radius:14px;
+  display:flex;align-items:center;justify-content:center;font-size:22px;
+}
+.quick-label{font-size:11px;color:var(--text2);text-align:center}
+
+.promo-cards{display:flex;gap:8px;padding:8px 10px;overflow-x:auto}
+.promo-cards::-webkit-scrollbar{display:none}
+.promo-card{
+  min-width:130px;border-radius:var(--radius);overflow:hidden;
+  cursor:pointer;flex-shrink:0;
+}
+.promo-card-top{padding:12px;color:#fff;font-weight:700}
+.promo-card-top .p-title{font-size:16px;margin-bottom:2px}
+.promo-card-top .p-sub{font-size:11px;opacity:0.85}
+
+.product-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:8px}
+.prod-card{
+  background:var(--white);border-radius:var(--radius);overflow:hidden;
+  cursor:pointer;box-shadow:var(--shadow);
+}
+.prod-img-box{
+  height:150px;display:flex;align-items:center;justify-content:center;
+  font-size:52px;background:var(--bg);
+}
+.prod-info{padding:8px 10px 10px}
+.prod-name{font-size:13px;color:var(--text);font-weight:600;margin-bottom:4px;line-height:1.3}
+.prod-price-row{display:flex;align-items:baseline;gap:6px}
+.prod-sales{font-size:11px;color:var(--text3);margin-top:3px}
+.prod-add-btn{
+  float:right;width:26px;height:26px;background:var(--red);
+  border-radius:50%;display:flex;align-items:center;justify-content:center;
+  color:#fff;font-size:18px;margin-top:-4px;
+}
+
+/* =====================================================
+   PAGE 2: ORDER (在线下单)
+===================================================== */
+.order-step{
+  display:flex;align-items:center;padding:0 16px;
+  background:var(--white);margin-bottom:8px;
+}
+.step-dot{
+  width:28px;height:28px;border-radius:50%;display:flex;
+  align-items:center;justify-content:center;font-size:12px;font-weight:700;
+  flex-shrink:0;
+}
+.step-dot.done{background:var(--green);color:#fff}
+.step-dot.active{background:var(--red);color:#fff}
+.step-dot.todo{background:var(--border);color:var(--text3)}
+.step-line{flex:1;height:2px;background:var(--border)}
+.step-line.done{background:var(--green)}
+.step-labels{display:flex;justify-content:space-between;padding:4px 10px 10px;background:var(--white)}
+.step-lbl{font-size:10px;color:var(--text3);text-align:center;width:50px}
+.step-lbl.active{color:var(--red);font-weight:700}
+
+.addr-card{
+  margin:8px;border-radius:var(--radius);background:var(--white);
+  padding:14px;box-shadow:var(--shadow);cursor:pointer;
+  display:flex;align-items:center;gap:12px;
+}
+.addr-icon{font-size:24px;color:var(--red)}
+.addr-info{flex:1}
+.addr-name{font-size:14px;font-weight:700;color:var(--text)}
+.addr-detail{font-size:12px;color:var(--text2);margin-top:2px}
+.addr-arrow{color:var(--text3)}
+
+.cart-item{
+  display:flex;gap:10px;padding:12px 14px;
+  background:var(--white);margin-bottom:1px;
+}
+.cart-img{
+  width:72px;height:72px;border-radius:var(--radius-sm);
+  background:var(--bg);display:flex;align-items:center;justify-content:center;
+  font-size:32px;flex-shrink:0;
+}
+.cart-meta{flex:1}
+.cart-name{font-size:13px;font-weight:600;color:var(--text);margin-bottom:3px;line-height:1.3}
+.cart-spec{font-size:11px;color:var(--text3);margin-bottom:6px}
+.qty-ctrl{display:flex;align-items:center;gap:0}
+.qty-btn{
+  width:26px;height:26px;border:0.5px solid var(--border);background:var(--white);
+  display:flex;align-items:center;justify-content:center;cursor:pointer;
+  font-size:16px;color:var(--text);
+}
+.qty-btn:first-child{border-radius:5px 0 0 5px}
+.qty-btn:last-child{border-radius:0 5px 5px 0}
+.qty-num{
+  width:36px;height:26px;border:0.5px solid var(--border);border-left:none;border-right:none;
+  display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;
+}
+
+.order-summary{background:var(--white);padding:14px;margin:8px;border-radius:var(--radius)}
+.summary-row{display:flex;justify-content:space-between;align-items:center;padding:5px 0}
+.summary-divider{height:0.5px;background:var(--border);margin:8px 0}
+.order-bar{
+  background:var(--white);padding:10px 14px;
+  display:flex;align-items:center;gap:10px;
+  border-top:0.5px solid var(--border);
+}
+
+/* =====================================================
+   PAGE 3: LOGISTICS (物流跟踪)
+===================================================== */
+.track-header{
+  background:linear-gradient(135deg,var(--blue) 0%,#1976D2 100%);
+  padding:16px;color:#fff;
+}
+.track-no{font-size:12px;opacity:0.8;margin-bottom:4px}
+.track-company{font-size:18px;font-weight:700;margin-bottom:8px}
+.track-status-badge{
+  display:inline-flex;align-items:center;gap:6px;
+  background:rgba(255,255,255,0.2);padding:6px 14px;border-radius:20px;
+  font-size:13px;font-weight:600;
+}
+.track-map{
+  background:linear-gradient(180deg,#E3F2FD 0%,#BBDEFB 100%);
+  height:120px;display:flex;align-items:center;justify-content:center;
+  position:relative;overflow:hidden;
+}
+.map-route{
+  display:flex;align-items:center;gap:4px;padding:0 20px;width:100%;
+}
+.map-city{font-size:12px;font-weight:700;color:var(--blue);text-align:center}
+.map-line{flex:1;height:2px;background:var(--blue);position:relative}
+.map-dot{
+  width:10px;height:10px;border-radius:50%;
+  background:var(--red);border:2px solid #fff;
+  position:absolute;top:-4px;animation:moveDot 3s ease-in-out infinite alternate;
+}
+@keyframes moveDot{0%{left:5%}100%{left:85%}}
+.map-truck{font-size:20px;position:absolute;animation:moveTruck 3s ease-in-out infinite alternate}
+@keyframes moveTruck{0%{left:12%}100%{left:72%}}
+
+.timeline{padding:16px}
+.timeline-item{display:flex;gap:12px;position:relative;padding-bottom:16px}
+.timeline-item:last-child{padding-bottom:0}
+.tl-line{position:absolute;left:9px;top:20px;bottom:0;width:2px;background:var(--border)}
+.timeline-item:last-child .tl-line{display:none}
+.tl-dot{
+  width:20px;height:20px;border-radius:50%;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;font-size:10px;
+  position:relative;z-index:1;
+}
+.tl-dot.active{background:var(--red);color:#fff}
+.tl-dot.done{background:var(--green);color:#fff}
+.tl-dot.todo{background:var(--border);color:var(--text3)}
+.tl-content{flex:1;padding-top:1px}
+.tl-time{font-size:11px;color:var(--text3);margin-bottom:2px}
+.tl-msg{font-size:13px;color:var(--text);line-height:1.4}
+.tl-msg.active{color:var(--red);font-weight:600}
+
+/* =====================================================
+   PAGE 4: MEMBER (会员管理)
+===================================================== */
+.member-card{
+  background:linear-gradient(135deg,#B71C1C 0%,#D32F2F 50%,#E53935 100%);
+  margin:8px;border-radius:var(--radius);padding:20px;color:#fff;
+  position:relative;overflow:hidden;
+}
+.member-card::before{
+  content:'';position:absolute;right:-30px;top:-30px;
+  width:150px;height:150px;border-radius:50%;background:rgba(255,255,255,0.08);
+}
+.member-avatar{width:52px;height:52px;border-radius:50%;background:rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;font-size:24px}
+.member-name{font-size:18px;font-weight:700;margin-bottom:2px}
+.member-level{font-size:12px;opacity:0.85}
+.member-level-badge{
+  display:inline-flex;align-items:center;gap:4px;
+  background:rgba(249,168,37,0.3);border:1px solid rgba(249,168,37,0.6);
+  color:var(--gold);padding:3px 10px;border-radius:12px;font-size:11px;font-weight:700;
+}
+.member-stats{display:flex;gap:0;margin-top:16px;padding-top:16px;border-top:1px solid rgba(255,255,255,0.2)}
+.member-stat{flex:1;text-align:center}
+.member-stat-num{font-size:20px;font-weight:800;margin-bottom:2px}
+.member-stat-lbl{font-size:11px;opacity:0.75}
+.member-stat+.member-stat{border-left:1px solid rgba(255,255,255,0.2)}
+
+.member-progress-section{padding:14px;background:var(--white);margin-bottom:8px}
+.progress-bar{height:8px;background:var(--border);border-radius:4px;overflow:hidden;margin:8px 0}
+.progress-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,var(--red),var(--gold));transition:width 0.5s}
+
+.privilege-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--border)}
+.privilege-item{
+  background:var(--white);padding:14px 8px;
+  display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;
+}
+.priv-icon{font-size:24px}
+.priv-label{font-size:11px;color:var(--text2);text-align:center}
+.priv-desc{font-size:10px;color:var(--text3);text-align:center}
+
+.order-tabs{display:flex;background:var(--white);border-bottom:0.5px solid var(--border)}
+.order-tab{
+  flex:1;padding:12px 6px;text-align:center;font-size:12px;
+  color:var(--text3);cursor:pointer;border-bottom:2px solid transparent;transition:all 0.2s;
+}
+.order-tab.active{color:var(--red);border-bottom-color:var(--red);font-weight:700}
+
+.mini-order{padding:12px 14px;background:var(--white);margin-bottom:1px}
+.mini-order-hd{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.mini-order-items{display:flex;gap:6px;margin-bottom:8px}
+.mini-order-img{width:56px;height:56px;border-radius:var(--radius-sm);background:var(--bg);display:flex;align-items:center;justify-content:center;font-size:26px}
+.mini-order-ft{display:flex;justify-content:space-between;align-items:center}
+
+/* =====================================================
+   PAGE 5: DISTRIBUTION (分销推广)
+===================================================== */
+.dist-hero{
+  background:linear-gradient(135deg,var(--orange) 0%,var(--orange2) 100%);
+  padding:20px;color:#fff;text-align:center;
+}
+.dist-title{font-size:22px;font-weight:800;margin-bottom:4px}
+.dist-sub{font-size:13px;opacity:0.85;margin-bottom:16px}
+.dist-stats{display:flex;gap:0;background:rgba(255,255,255,0.15);border-radius:var(--radius);overflow:hidden}
+.dist-stat{flex:1;padding:12px;text-align:center}
+.dist-stat+.dist-stat{border-left:1px solid rgba(255,255,255,0.2)}
+.dist-stat-num{font-size:22px;font-weight:800;color:#fff}
+.dist-stat-lbl{font-size:11px;color:rgba(255,255,255,0.8);margin-top:2px}
+
+.refer-card{
+  margin:8px;background:var(--white);border-radius:var(--radius);
+  padding:16px;box-shadow:var(--shadow);
+}
+.refer-progress{margin:12px 0}
+.refer-bubbles{display:flex;gap:-8px;margin:8px 0}
+.refer-bubble{
+  width:36px;height:36px;border-radius:50%;background:var(--bg);
+  display:flex;align-items:center;justify-content:center;font-size:16px;
+  border:2px solid var(--white);box-shadow:var(--shadow);
+  margin-right:-10px;
+}
+.refer-bubble.done{background:var(--green-light)}
+.refer-bubble.active{background:var(--red-light);animation:pulse 1.5s infinite}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.1)}}
+
+.commission-list{background:var(--white)}
+.commission-item{
+  display:flex;align-items:center;gap:12px;padding:12px 14px;
+  border-bottom:0.5px solid var(--border);
+}
+.comm-avatar{width:40px;height:40px;border-radius:50%;background:var(--bg);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.comm-info{flex:1}
+.comm-name{font-size:13px;font-weight:600;color:var(--text)}
+.comm-time{font-size:11px;color:var(--text3)}
+.comm-amount{font-size:15px;font-weight:800;color:var(--green)}
+
+.leaderboard{background:var(--white);margin-bottom:8px}
+.lb-item{
+  display:flex;align-items:center;gap:12px;padding:10px 14px;
+  border-bottom:0.5px solid var(--border);
+}
+.lb-rank{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;flex-shrink:0}
+.lb-rank.gold{background:#FFC107;color:#5D4037}
+.lb-rank.silver{background:#9E9E9E;color:#fff}
+.lb-rank.bronze{background:#8D6E63;color:#fff}
+.lb-rank.other{background:var(--bg);color:var(--text3)}
+.lb-avatar{font-size:22px}
+.lb-info{flex:1}
+.lb-name{font-size:13px;font-weight:600;color:var(--text)}
+.lb-num{font-size:11px;color:var(--text3)}
+.lb-earn{font-size:14px;font-weight:800;color:var(--orange)}
+
+/* =====================================================
+   PAGE 6: ADMIN (后台管理)
+===================================================== */
+.admin-header{
+  background:linear-gradient(135deg,#1A1A2E 0%,#16213E 100%);
+  padding:16px;color:#fff;
+}
+.admin-greeting{font-size:12px;opacity:0.6;margin-bottom:4px}
+.admin-name{font-size:18px;font-weight:700}
+.admin-date{font-size:11px;opacity:0.5;margin-top:2px}
+
+.data-cards{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:8px}
+.data-card{
+  background:var(--white);border-radius:var(--radius);padding:14px;
+  box-shadow:var(--shadow);cursor:pointer;
+}
+.data-card-icon{font-size:22px;margin-bottom:8px}
+.data-card-num{font-size:22px;font-weight:800;color:var(--text);margin-bottom:2px}
+.data-card-label{font-size:11px;color:var(--text3)}
+.data-card-trend{font-size:11px;margin-top:4px}
+.trend-up{color:var(--green)}.trend-down{color:var(--red)}
+
+.admin-nav{background:var(--white);margin:0 8px 8px;border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow)}
+.admin-nav-item{
+  display:flex;align-items:center;gap:12px;padding:14px;
+  border-bottom:0.5px solid var(--border);cursor:pointer;
+  transition:background 0.15s;
+}
+.admin-nav-item:last-child{border-bottom:none}
+.admin-nav-item:active{background:var(--bg)}
+.admin-nav-icon{
+  width:38px;height:38px;border-radius:var(--radius-sm);
+  display:flex;align-items:center;justify-content:center;font-size:20px;
+}
+.admin-nav-info{flex:1}
+.admin-nav-title{font-size:14px;font-weight:600;color:var(--text)}
+.admin-nav-desc{font-size:11px;color:var(--text3);margin-top:1px}
+.admin-nav-arrow{color:var(--text3);font-size:14px}
+
+.chart-card{background:var(--white);margin:8px;border-radius:var(--radius);padding:14px;box-shadow:var(--shadow)}
+.chart-title{font-size:13px;font-weight:700;color:var(--text);margin-bottom:12px}
+.bar-chart{display:flex;align-items:flex-end;gap:6px;height:80px}
+.bar-wrap{display:flex;flex-direction:column;align-items:center;flex:1;gap:3px}
+.bar{border-radius:4px 4px 0 0;background:linear-gradient(180deg,var(--red) 0%,#EF9A9A 100%);width:100%;transition:height 0.5s}
+.bar-label{font-size:9px;color:var(--text3);text-align:center}
+.bar-val{font-size:9px;color:var(--red);font-weight:700;text-align:center}
+
+/* =====================================================
+   PAGE 7: DECORATION (自定义装修)
+===================================================== */
+.deco-toolbar{
+  background:var(--white);display:flex;gap:0;
+  border-bottom:0.5px solid var(--border);overflow-x:auto;
+}
+.deco-toolbar::-webkit-scrollbar{display:none}
+.deco-tool{
+  padding:10px 14px;font-size:12px;color:var(--text3);
+  white-space:nowrap;cursor:pointer;border-bottom:2px solid transparent;
+}
+.deco-tool.active{color:var(--red);border-bottom-color:var(--red);font-weight:700}
+
+.deco-canvas{
+  flex:1;background:#f5f5f5;position:relative;overflow:auto;
+  padding:8px;
+}
+.deco-component{
+  background:var(--white);border-radius:var(--radius-sm);margin-bottom:6px;
+  border:1.5px dashed var(--border);position:relative;cursor:pointer;
+  transition:border-color 0.2s;
+}
+.deco-component:hover,.deco-component.selected{border-color:var(--red)}
+.deco-component-label{
+  position:absolute;top:6px;left:6px;
+  background:var(--red);color:#fff;font-size:9px;font-weight:700;
+  padding:2px 6px;border-radius:4px;
+}
+.deco-component-actions{
+  position:absolute;top:4px;right:4px;
+  display:flex;gap:4px;
+}
+.deco-action-btn{
+  width:22px;height:22px;border-radius:4px;background:rgba(0,0,0,0.6);
+  display:flex;align-items:center;justify-content:center;
+  color:#fff;font-size:12px;cursor:pointer;border:none;
+}
+
+.deco-panel{
+  background:var(--white);border-top:0.5px solid var(--border);
+  padding:12px;max-height:160px;overflow-y:auto;
+}
+.deco-panel-title{font-size:12px;font-weight:700;color:var(--text);margin-bottom:10px}
+.comp-palette{display:flex;flex-wrap:wrap;gap:8px}
+.comp-tile{
+  width:64px;height:54px;background:var(--bg);border-radius:var(--radius-sm);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:3px;cursor:pointer;border:0.5px solid var(--border);font-size:10px;color:var(--text2);
+  transition:all 0.15s;
+}
+.comp-tile:active{background:var(--red-light);border-color:var(--red);color:var(--red)}
+.comp-tile-icon{font-size:20px}
+
+/* ===== DECORATIVE COMPONENTS IN CANVAS ===== */
+.deco-banner-preview{
+  height:80px;background:linear-gradient(135deg,var(--red) 0%,#EF5350 100%);
+  border-radius:var(--radius-sm);display:flex;align-items:center;padding:0 14px;
+  color:#fff;font-size:16px;font-weight:700;
+}
+.deco-grid-preview{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:10px}
+.deco-grid-icon{display:flex;flex-direction:column;align-items:center;gap:4px}
+.deco-grid-emoji{width:36px;height:36px;background:var(--bg);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px}
+.deco-grid-lbl{font-size:9px;color:var(--text3)}
+.deco-prod-preview{display:flex;gap:8px;padding:8px}
+.deco-prod-item{flex:1;background:var(--bg);border-radius:var(--radius-sm);height:90px;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding-bottom:8px}
+.deco-notice-preview{background:var(--gold-light);padding:7px 10px;font-size:11px;color:#5D4037}
+
+/* ===== RESPONSIVE ===== */
+@media(max-width:600px){
+  .app-frame{padding:12px 8px;gap:20px}
+  .phone{width:100%;max-width:375px}
+}
+</style>
 </head>
-<body class="bg-gray-100 font-sans">
+<body>
 
-    <!-- 模拟手机壳容器 -->
-    <div class="max-w-md mx-auto bg-white min-h-screen shadow-2xl relative overflow-hidden">
-        
-        <!-- 状态栏模拟 -->
-        <div class="h-6 bg-white flex justify-between items-center px-4 pt-2">
-            <span class="text-xs font-bold">12:00</span>
-            <div class="flex space-x-1">
-                <div class="w-3 h-3 bg-gray-400 rounded-full"></div>
-                <div class="w-3 h-3 bg-gray-400 rounded-full"></div>
-            </div>
-        </div>
+<div id="toast"></div>
 
-        <!-- 顶部通知轮播 -->
-        <div class="bg-orange-50 px-4 py-2">
-            <p class="text-orange-600 text-xs animate-pulse">🔥 用户 张** 刚刚完成邀请，已获得 99元 全额返现！</p>
-        </div>
+<div class="app-frame">
 
-        <!-- 产品详情 -->
-        <div class="p-4">
-            <div class="rounded-xl overflow-hidden shadow-lg mb-4">
-                <img src="https://images.unsplash.com/photo-1520333781090-e2ad16ba8e82?auto=format&fit=crop&w=800&q=80" alt="洗车服务" class="w-full h-48 object-cover">
-            </div>
-            <h1 class="text-xl font-bold text-gray-800">精选全自动无损洗车服务</h1>
-            <p class="text-gray-500 text-sm mt-1">原价：￥99 | 累计已有 1,284 人免单成功</p>
-            <div class="mt-4 flex items-baseline">
-                <span class="text-2xl font-bold text-red-500 font-mono">￥99.00</span>
-                <span class="ml-2 text-xs text-white bg-red-500 px-2 py-0.5 rounded-full">推三免一</span>
-            </div>
-        </div>
+<!-- ============================================================
+     PHONE 1: 客户端 (Customer Side)
+============================================================ -->
+<div>
+<div class="phone" id="phone-customer">
+  <div class="phone-screen">
 
-        <!-- 核心任务区 -->
-        <div class="mx-4 p-6 bg-gray-50 rounded-2xl border-2 border-dashed border-gray-200">
-            <h2 class="text-center font-bold text-gray-700 mb-6">我的免单进度</h2>
-            
-            <div class="flex justify-around items-center mb-8">
-                <!-- A: 楼主 -->
-                <div class="flex flex-col items-center">
-                    <div class="w-14 h-14 rounded-full border-2 border-orange-500 p-0.5 relative">
-                        <img src="https://i.pravatar.cc/150?u=me" class="rounded-full">
-                        <span class="absolute -bottom-2 bg-orange-500 text-white text-[10px] px-2 rounded-full">发起人</span>
-                    </div>
-                    <span class="text-xs mt-3 text-gray-400">我</span>
-                </div>
-
-                <!-- B: 已下单 -->
-                <div class="flex flex-col items-center">
-                    <div class="w-14 h-14 rounded-full border-2 border-green-500 p-0.5 relative bg-white">
-                        <img src="https://i.pravatar.cc/150?u=friend1" class="rounded-full">
-                        <div class="absolute -top-1 -right-1 bg-green-500 rounded-full p-1 shadow">
-                            <svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
-                        </div>
-                    </div>
-                    <span class="text-xs mt-3 text-green-600 font-bold">已下单</span>
-                </div>
-
-                <!-- C: 待邀请 -->
-                <div class="flex flex-col items-center opacity-40">
-                    <div class="w-14 h-14 rounded-full border-2 border-gray-300 border-dashed flex items-center justify-center bg-gray-100">
-                        <span class="text-2xl text-gray-400">+</span>
-                    </div>
-                    <span class="text-xs mt-3 text-gray-400">待邀请</span>
-                </div>
-
-                <!-- D: 待邀请 -->
-                <div class="flex flex-col items-center opacity-40">
-                    <div class="w-14 h-14 rounded-full border-2 border-gray-300 border-dashed flex items-center justify-center bg-gray-100">
-                        <span class="text-2xl text-gray-400">+</span>
-                    </div>
-                    <span class="text-xs mt-3 text-gray-400">待邀请</span>
-                </div>
-            </div>
-
-            <button onclick="showSuccess()" class="w-full bg-red-500 hover:bg-red-600 text-white font-bold py-4 rounded-xl shadow-lg transition-all active:scale-95 animate-bounce-slow">
-                立即分享，还差 2 人免单
-            </button>
-        </div>
-
-        <!-- 商家背书 -->
-        <div class="p-8 text-center text-gray-400 text-xs">
-            本活动由 [XX洗车连锁中心] 与 [XX技术] 联合提供<br>
-            支付资金受微信支付监管，安全有保障
-        </div>
-
-        <!-- 【核心演示：返现成功弹窗】 -->
-        <div id="successModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-6 glass">
-            <div class="red-pocket w-full max-w-xs rounded-3xl p-8 text-center shadow-2xl transform transition-all">
-                <div class="w-20 h-20 bg-yellow-400 rounded-full mx-auto flex items-center justify-center mb-4 shadow-inner border-4 border-yellow-200">
-                    <span class="text-4xl text-red-600 font-bold">￥</span>
-                </div>
-                <h3 class="text-white text-2xl font-bold mb-2">恭喜！任务达成</h3>
-                <p class="text-red-100 text-sm mb-6">您购买的产品已由系统执行<br><b class="text-yellow-300">全额原路退款</b></p>
-                
-                <div class="bg-white/10 rounded-xl p-4 mb-6">
-                    <div class="flex justify-between text-xs text-red-100 mb-1">
-                        <span>退款金额</span>
-                        <span class="font-bold text-white">￥99.00</span>
-                    </div>
-                    <div class="flex justify-between text-xs text-red-100">
-                        <span>到账账户</span>
-                        <span class="font-bold text-white">微信零钱</span>
-                    </div>
-                </div>
-
-                <button onclick="closeModal()" class="w-full bg-yellow-400 text-red-700 font-bold py-3 rounded-full shadow-lg hover:bg-yellow-300">
-                    查看详情
-                </button>
-            </div>
-        </div>
-
+    <div class="status-bar">
+      <span>12:08</span><span>🔋 92%</span>
     </div>
 
-    <script>
-        function showSuccess() {
-            document.getElementById('successModal').classList.remove('hidden');
-        }
-        function closeModal() {
-            document.getElementById('successModal').classList.add('hidden');
-            alert('模拟功能：您的技术服务费(5%)已同步自动划扣至您的账户！');
-        }
-    </script>
+    <!-- ===== PAGE: HOME ===== -->
+    <div class="page active" id="page-home">
+      <div class="nav-bar">
+        <span class="nav-title">🛍️ 推三免一商城</span>
+        <span class="nav-right" onclick="showToast('🔔 消息中心')">🔔</span>
+      </div>
+      <div class="page-body">
+
+        <div class="notice-bar">
+          <span style="font-size:14px">📢</span>
+          <div class="notice-scroll">
+            <span class="notice-inner">🎉 推荐3位好友下单，即可免费获得同款商品！&nbsp;&nbsp;&nbsp;&nbsp;⚡ 新人首单立减20元&nbsp;&nbsp;&nbsp;&nbsp;🎁 会员积分双倍活动进行中</span>
+          </div>
+        </div>
+
+        <div class="home-banner">
+          <span class="banner-tag">🔥 限时活动</span>
+          <div class="banner-title">推三免一<br>赚好货不花钱！</div>
+          <div class="banner-sub">分享给3位好友购买 → 你免费获得1件</div>
+          <div class="banner-actions">
+            <button class="btn btn-sm" style="background:#fff;color:var(--red);font-size:12px" onclick="goPage('page-dist')">立即参与 →</button>
+            <button class="btn btn-sm btn-ghost" style="border-color:rgba(255,255,255,0.6);color:#fff;font-size:12px" onclick="goPage('page-order')">直接购买</button>
+          </div>
+          <div class="banner-progress" id="homeProg">
+            <div class="banner-progress-fill" id="homeProgFill"></div>
+          </div>
+          <div class="banner-progress-label" id="homeProgLbl">已推荐 1/3 人，再邀请 2 人即可免费！</div>
+        </div>
+
+        <div class="quick-grid">
+          <div class="quick-item" onclick="goPage('page-order')">
+            <div class="quick-icon" style="background:#FFEBEE">🛒</div>
+            <span class="quick-label">在线下单</span>
+          </div>
+          <div class="quick-item" onclick="goPage('page-track')">
+            <div class="quick-icon" style="background:#E3F2FD">📦</div>
+            <span class="quick-label">物流跟踪</span>
+          </div>
+          <div class="quick-item" onclick="goPage('page-member')">
+            <div class="quick-icon" style="background:#FFF8E1">👑</div>
+            <span class="quick-label">会员中心</span>
+          </div>
+          <div class="quick-item" onclick="goPage('page-dist')">
+            <div class="quick-icon" style="background:#E8F5E9">💰</div>
+            <span class="quick-label">分销推广</span>
+          </div>
+          <div class="quick-item" onclick="showToast('🎯 更多功能')">
+            <div class="quick-icon" style="background:#F3E5F5">⋯</div>
+            <span class="quick-label">更多</span>
+          </div>
+        </div>
+
+        <div style="overflow:hidden">
+          <div class="promo-cards">
+            <div class="promo-card" onclick="showToast('推三免一活动')">
+              <div class="promo-card-top" style="background:linear-gradient(135deg,#C62828,#EF5350)">
+                <div class="p-title">推三免一</div>
+                <div class="p-sub">推荐3人 · 免费得1件</div>
+              </div>
+            </div>
+            <div class="promo-card" onclick="showToast('会员折扣专区')">
+              <div class="promo-card-top" style="background:linear-gradient(135deg,#1565C0,#42A5F5)">
+                <div class="p-title">会员专属</div>
+                <div class="p-sub">黄金会员9折优惠</div>
+              </div>
+            </div>
+            <div class="promo-card" onclick="showToast('积分兑换')">
+              <div class="promo-card-top" style="background:linear-gradient(135deg,#E65100,#FF8F00)">
+                <div class="p-title">积分换购</div>
+                <div class="p-sub">500积分换好礼</div>
+              </div>
+            </div>
+            <div class="promo-card" onclick="showToast('新人专区')">
+              <div class="promo-card-top" style="background:linear-gradient(135deg,#1B5E20,#4CAF50)">
+                <div class="p-title">新人福利</div>
+                <div class="p-sub">首单立减20元</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="section-hd">
+            <span class="section-title">🔥 热销商品</span>
+            <span class="section-more" onclick="showToast('全部商品')">全部 ›</span>
+          </div>
+          <div class="product-grid">
+            <div class="prod-card" onclick="openProductModal('红枣枸杞养生茶','🫖','39.9','58','已售2831件','养生')">
+              <div class="prod-img-box">🫖</div>
+              <div class="prod-info">
+                <div class="prod-name">红枣枸杞养生茶</div>
+                <div class="prod-price-row">
+                  <span class="price">¥39.9</span>
+                  <span class="orig-price">¥58</span>
+                </div>
+                <div class="prod-sales">已售2831件</div>
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-top:4px">
+                  <span class="badge badge-red">推三免一</span>
+                  <span class="prod-add-btn" onclick="event.stopPropagation();addToCart('红枣枸杞养生茶',39.9)">+</span>
+                </div>
+              </div>
+            </div>
+            <div class="prod-card" onclick="openProductModal('山药薏米代餐粉','🌾','49.9','78','已售1256件','代餐')">
+              <div class="prod-img-box">🌾</div>
+              <div class="prod-info">
+                <div class="prod-name">山药薏米代餐粉</div>
+                <div class="prod-price-row">
+                  <span class="price">¥49.9</span>
+                  <span class="orig-price">¥78</span>
+                </div>
+                <div class="prod-sales">已售1256件</div>
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-top:4px">
+                  <span class="badge badge-red">推三免一</span>
+                  <span class="prod-add-btn" onclick="event.stopPropagation();addToCart('山药薏米代餐粉',49.9)">+</span>
+                </div>
+              </div>
+            </div>
+            <div class="prod-card" onclick="openProductModal('云南百花野生蜜','🍯','68','99','已售987件','蜂蜜')">
+              <div class="prod-img-box">🍯</div>
+              <div class="prod-info">
+                <div class="prod-name">云南百花野生蜜</div>
+                <div class="prod-price-row">
+                  <span class="price">¥68</span>
+                  <span class="orig-price">¥99</span>
+                </div>
+                <div class="prod-sales">已售987件</div>
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-top:4px">
+                  <span class="badge badge-gold">爆款</span>
+                  <span class="prod-add-btn" onclick="event.stopPropagation();addToCart('云南百花野生蜜',68)">+</span>
+                </div>
+              </div>
+            </div>
+            <div class="prod-card" onclick="openProductModal('枸杞原浆饮品','🍹','88','128','已售654件','饮品')">
+              <div class="prod-img-box">🍹</div>
+              <div class="prod-info">
+                <div class="prod-name">枸杞原浆饮品</div>
+                <div class="prod-price-row">
+                  <span class="price">¥88</span>
+                  <span class="orig-price">¥128</span>
+                </div>
+                <div class="prod-sales">已售654件</div>
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-top:4px">
+                  <span class="badge badge-blue">会员价</span>
+                  <span class="prod-add-btn" onclick="event.stopPropagation();addToCart('枸杞原浆饮品',88)">+</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div style="height:10px"></div>
+      </div>
+
+      <div class="tab-bar">
+        <div class="tab-item active" onclick="goPage('page-home')">
+          <span class="tab-icon">🏠</span><span>首页</span>
+        </div>
+        <div class="tab-item" onclick="goPage('page-order')">
+          <span class="tab-icon-wrap"><span class="tab-icon">🛍️</span></span><span>商品</span>
+        </div>
+        <div class="tab-item" onclick="openCartModal()">
+          <span class="tab-icon-wrap"><span class="tab-icon">🛒</span><span class="tab-badge" id="cartBadge">0</span></span>
+          <span>购物车</span>
+        </div>
+        <div class="tab-item" onclick="goPage('page-member')">
+          <span class="tab-icon">👤</span><span>我的</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== PAGE: ORDER ===== -->
+    <div class="page" id="page-order">
+      <div class="nav-bar">
+        <span class="nav-back" onclick="goPage('page-home')">←</span>
+        <span class="nav-title">在线下单</span>
+        <span class="nav-right" onclick="showToast('📋 订单记录')">📋</span>
+      </div>
+      <div class="page-body">
+
+        <div style="padding:12px 8px 4px;background:var(--bg)">
+          <div style="display:flex;align-items:center;gap:0;margin-bottom:8px">
+            <div class="step-dot done">✓</div>
+            <div class="step-line done"></div>
+            <div class="step-dot active">2</div>
+            <div class="step-line"></div>
+            <div class="step-dot todo">3</div>
+            <div class="step-line"></div>
+            <div class="step-dot todo">4</div>
+          </div>
+          <div style="display:flex;justify-content:space-between;padding:0 2px">
+            <span style="font-size:9px;color:var(--green);font-weight:700">选商品</span>
+            <span style="font-size:9px;color:var(--red);font-weight:700">确认单</span>
+            <span style="font-size:9px;color:var(--text3)">去支付</span>
+            <span style="font-size:9px;color:var(--text3)">完成</span>
+          </div>
+        </div>
+
+        <div class="addr-card" onclick="showToast('📍 切换收货地址')">
+          <span class="addr-icon">📍</span>
+          <div class="addr-info">
+            <div class="addr-name">张小明 &nbsp; 138-0000-1234</div>
+            <div class="addr-detail">广东省深圳市南山区科技园南路18号天利大厦</div>
+          </div>
+          <span class="addr-arrow">›</span>
+        </div>
+
+        <div style="margin-bottom:1px">
+          <div class="cart-item">
+            <div class="cart-img">🫖</div>
+            <div class="cart-meta">
+              <div class="cart-name">红枣枸杞养生茶</div>
+              <div class="cart-spec">规格：原味 / 150g</div>
+              <div class="row" style="justify-content:space-between">
+                <span class="price">¥39.9</span>
+                <div class="qty-ctrl">
+                  <div class="qty-btn" onclick="changeQty(this,-1)">−</div>
+                  <div class="qty-num">2</div>
+                  <div class="qty-btn" onclick="changeQty(this,1)">+</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="cart-item">
+            <div class="cart-img">🍯</div>
+            <div class="cart-meta">
+              <div class="cart-name">云南百花野生蜜</div>
+              <div class="cart-spec">规格：土蜂蜜 / 500g</div>
+              <div class="row" style="justify-content:space-between">
+                <span class="price">¥68</span>
+                <div class="qty-ctrl">
+                  <div class="qty-btn" onclick="changeQty(this,-1)">−</div>
+                  <div class="qty-num">1</div>
+                  <div class="qty-btn" onclick="changeQty(this,1)">+</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="order-summary">
+          <div class="summary-row">
+            <span class="text-sm text-gray">商品合计</span>
+            <span class="text-sm bold">¥147.8</span>
+          </div>
+          <div class="summary-row">
+            <span class="text-sm text-gray">运费</span>
+            <span class="text-sm bold text-green">免费</span>
+          </div>
+          <div class="summary-row">
+            <span class="text-sm text-gray">会员折扣</span>
+            <span class="text-sm bold text-red">-¥14.78</span>
+          </div>
+          <div class="summary-row">
+            <span class="text-sm text-gray">推三免一抵扣</span>
+            <span class="text-sm bold text-red">-¥39.9</span>
+          </div>
+          <div class="summary-divider"></div>
+          <div class="summary-row">
+            <span style="font-size:14px;font-weight:700;color:var(--text)">实付金额</span>
+            <span class="price-lg">¥93.12</span>
+          </div>
+        </div>
+
+        <div style="background:var(--white);padding:12px 14px;margin:0 0 8px">
+          <div class="row gap8" style="margin-bottom:8px">
+            <span style="font-size:20px">🏷️</span>
+            <span class="text-sm bold">推三免一优惠已生效</span>
+            <span class="badge badge-red">省¥39.9</span>
+          </div>
+          <div style="font-size:12px;color:var(--text3)">您已推荐1位好友下单，还需2位好友购买即可继续享受下次免单</div>
+        </div>
+
+        <div style="height:10px"></div>
+      </div>
+
+      <div class="order-bar">
+        <div>
+          <span class="text-xs text-gray">实付：</span>
+          <span class="price-lg">¥93.12</span>
+        </div>
+        <button class="btn btn-primary" style="flex:1;margin-left:8px;border-radius:var(--radius-sm)" onclick="placeOrder()">立即结算</button>
+      </div>
+    </div>
+
+    <!-- ===== PAGE: LOGISTICS ===== -->
+    <div class="page" id="page-track">
+      <div class="nav-bar">
+        <span class="nav-back" onclick="goPage('page-home')">←</span>
+        <span class="nav-title">物流跟踪</span>
+        <span class="nav-right" onclick="showToast('📞 联系客服')">📞</span>
+      </div>
+      <div class="page-body">
+
+        <div class="track-header">
+          <div class="track-no">快递单号：SF1234567890123</div>
+          <div class="track-company">顺丰速运</div>
+          <div class="track-status-badge">🚚 运输中</div>
+        </div>
+
+        <div class="track-map">
+          <div class="map-route">
+            <div class="map-city">深圳</div>
+            <div class="map-line">
+              <div class="map-dot"></div>
+            </div>
+            <div class="map-city">广州</div>
+            <div class="map-line"></div>
+            <div class="map-city">北京</div>
+          </div>
+          <div class="map-truck" style="top:38%;font-size:22px">🚚</div>
+        </div>
+
+        <div class="section" style="margin-bottom:0">
+          <div class="section-hd">
+            <span class="section-title">📋 物流详情</span>
+          </div>
+        </div>
+
+        <div style="background:var(--white);padding:4px 16px 16px">
+          <div class="timeline">
+            <div class="timeline-item">
+              <div class="tl-line"></div>
+              <div class="tl-dot active">●</div>
+              <div class="tl-content">
+                <div class="tl-time">2026-05-16 10:32</div>
+                <div class="tl-msg active">🚚 快件已由快递员揽收，正在运往广州转运中心</div>
+              </div>
+            </div>
+            <div class="timeline-item">
+              <div class="tl-line"></div>
+              <div class="tl-dot done">✓</div>
+              <div class="tl-content">
+                <div class="tl-time">2026-05-16 08:15</div>
+                <div class="tl-msg">📦 您的订单已打包完成，等待揽收</div>
+              </div>
+            </div>
+            <div class="timeline-item">
+              <div class="tl-line"></div>
+              <div class="tl-dot done">✓</div>
+              <div class="tl-content">
+                <div class="tl-time">2026-05-15 18:40</div>
+                <div class="tl-msg">✅ 商家已确认订单，安排备货发货</div>
+              </div>
+            </div>
+            <div class="timeline-item">
+              <div class="tl-line"></div>
+              <div class="tl-dot done">✓</div>
+              <div class="tl-content">
+                <div class="tl-time">2026-05-15 14:22</div>
+                <div class="tl-msg">💳 订单支付成功，共¥93.12</div>
+              </div>
+            </div>
+            <div class="timeline-item">
+              <div class="tl-dot done">✓</div>
+              <div class="tl-content">
+                <div class="tl-time">2026-05-15 14:18</div>
+                <div class="tl-msg">🛒 成功下单，订单号 NO.2026051500123</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div style="margin:8px;background:var(--white);border-radius:var(--radius);padding:14px;box-shadow:var(--shadow)">
+          <div class="row gap8" style="margin-bottom:8px">
+            <span style="font-size:18px">📦</span>
+            <span class="bold" style="font-size:14px">包裹内容</span>
+          </div>
+          <div class="row gap8">
+            <span style="font-size:24px">🫖</span>
+            <div class="col flex1">
+              <span class="text-sm bold">红枣枸杞养生茶 ×2</span>
+              <span class="text-xs text-gray">规格：原味/150g</span>
+            </div>
+            <span class="price">¥39.9×2</span>
+          </div>
+          <div class="divider" style="margin:10px 0"></div>
+          <div class="row gap8">
+            <span style="font-size:24px">🍯</span>
+            <div class="col flex1">
+              <span class="text-sm bold">云南百花野生蜜 ×1</span>
+              <span class="text-xs text-gray">规格：土蜂蜜/500g</span>
+            </div>
+            <span class="price">¥68</span>
+          </div>
+        </div>
+        <div style="height:10px"></div>
+      </div>
+    </div>
+
+    <!-- ===== PAGE: MEMBER ===== -->
+    <div class="page" id="page-member">
+      <div class="nav-bar">
+        <span class="nav-back" onclick="goPage('page-home')">←</span>
+        <span class="nav-title">会员中心</span>
+        <span class="nav-right" onclick="showToast('⚙️ 账号设置')">⚙️</span>
+      </div>
+      <div class="page-body">
+
+        <div class="member-card">
+          <div class="row gap12" style="margin-bottom:12px">
+            <div class="member-avatar">👨</div>
+            <div class="col flex1">
+              <div class="member-name">张小明</div>
+              <div class="member-level">
+                <span class="member-level-badge">👑 黄金会员</span>
+              </div>
+            </div>
+            <button class="btn btn-sm" style="background:rgba(255,255,255,0.2);color:#fff;font-size:11px" onclick="showToast('📝 编辑资料')">编辑资料</button>
+          </div>
+          <div class="member-stats">
+            <div class="member-stat">
+              <div class="member-stat-num">1,280</div>
+              <div class="member-stat-lbl">积分</div>
+            </div>
+            <div class="member-stat">
+              <div class="member-stat-num">3</div>
+              <div class="member-stat-lbl">推荐人数</div>
+            </div>
+            <div class="member-stat">
+              <div class="member-stat-num">¥234</div>
+              <div class="member-stat-lbl">累计省钱</div>
+            </div>
+            <div class="member-stat">
+              <div class="member-stat-num">12</div>
+              <div class="member-stat-lbl">累计订单</div>
+            </div>
+          </div>
+        </div>
+
+        <div style="background:var(--white);padding:12px 14px;margin-bottom:8px">
+          <div class="row" style="justify-content:space-between;margin-bottom:6px">
+            <span class="bold text-sm">距离铂金会员</span>
+            <span class="text-xs text-red">还差 720 积分</span>
+          </div>
+          <div class="progress-bar">
+            <div class="progress-fill" style="width:64%"></div>
+          </div>
+          <div class="row" style="justify-content:space-between">
+            <span class="text-xs text-gray">当前积分：1280</span>
+            <span class="text-xs text-gray">铂金门槛：2000</span>
+          </div>
+        </div>
+
+        <div class="section-hd"><span class="section-title">🎁 会员特权</span></div>
+        <div class="privilege-grid">
+          <div class="privilege-item" onclick="showToast('🎫 专属优惠券已到账')">
+            <span class="priv-icon">🎫</span>
+            <span class="priv-label">专属券</span>
+            <span class="priv-desc">每月2张</span>
+          </div>
+          <div class="privilege-item" onclick="showToast('💰 9折会员价')">
+            <span class="priv-icon">💰</span>
+            <span class="priv-label">折扣价</span>
+            <span class="priv-desc">9折优惠</span>
+          </div>
+          <div class="privilege-item" onclick="showToast('📦 免运费特权')">
+            <span class="priv-icon">📦</span>
+            <span class="priv-label">免邮费</span>
+            <span class="priv-desc">全场包邮</span>
+          </div>
+          <div class="privilege-item" onclick="showToast('⚡ 积分加速中')">
+            <span class="priv-icon">⚡</span>
+            <span class="priv-label">积分×2</span>
+            <span class="priv-desc">双倍积累</span>
+          </div>
+          <div class="privilege-item" onclick="showToast('🔖 优先发货')">
+            <span class="priv-icon">🚀</span>
+            <span class="priv-label">优先发货</span>
+            <span class="priv-desc">专属通道</span>
+          </div>
+          <div class="privilege-item" onclick="showToast('🎂 生日特权')">
+            <span class="priv-icon">🎂</span>
+            <span class="priv-label">生日礼</span>
+            <span class="priv-desc">专属礼包</span>
+          </div>
+          <div class="privilege-item" onclick="showToast('💎 专属客服')">
+            <span class="priv-icon">💎</span>
+            <span class="priv-label">专属客服</span>
+            <span class="priv-desc">优先响应</span>
+          </div>
+          <div class="privilege-item" onclick="showToast('🔄 无忧退换')">
+            <span class="priv-icon">🔄</span>
+            <span class="priv-label">无忧退换</span>
+            <span class="priv-desc">30天退换</span>
+          </div>
+        </div>
+
+        <div class="order-tabs" style="margin-top:8px">
+          <div class="order-tab active" onclick="switchOrderTab(this,'全部')">全部订单</div>
+          <div class="order-tab" onclick="switchOrderTab(this,'待付款')">待付款</div>
+          <div class="order-tab" onclick="switchOrderTab(this,'待发货')">待发货</div>
+          <div class="order-tab" onclick="switchOrderTab(this,'已完成')">已完成</div>
+        </div>
+
+        <div>
+          <div class="mini-order">
+            <div class="mini-order-hd">
+              <span class="text-xs text-gray">2026-05-15 &nbsp; 订单 #2026051500123</span>
+              <span class="badge badge-green">已发货</span>
+            </div>
+            <div class="mini-order-items">
+              <div class="mini-order-img">🫖</div>
+              <div class="mini-order-img">🍯</div>
+            </div>
+            <div class="mini-order-ft">
+              <span class="text-xs text-gray">共2件商品 &nbsp; 实付</span>
+              <div class="row gap8">
+                <span class="price">¥93.12</span>
+                <button class="btn btn-sm btn-ghost" onclick="goPage('page-track')">查看物流</button>
+              </div>
+            </div>
+          </div>
+          <div class="mini-order">
+            <div class="mini-order-hd">
+              <span class="text-xs text-gray">2026-04-28 &nbsp; 订单 #2026042800456</span>
+              <span class="badge badge-blue">已完成</span>
+            </div>
+            <div class="mini-order-items">
+              <div class="mini-order-img">🌾</div>
+            </div>
+            <div class="mini-order-ft">
+              <span class="text-xs text-gray">共1件商品 &nbsp; 实付</span>
+              <div class="row gap8">
+                <span class="price">¥49.9</span>
+                <button class="btn btn-sm" style="background:var(--bg);color:var(--text2);border:0.5px solid var(--border);border-radius:16px;padding:6px 14px;font-size:12px" onclick="showToast('⭐ 好评已提交，获得20积分')">去评价</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div style="height:10px"></div>
+      </div>
+    </div>
+
+    <!-- ===== PAGE: DISTRIBUTION ===== -->
+    <div class="page" id="page-dist">
+      <div class="nav-bar">
+        <span class="nav-back" onclick="goPage('page-home')">←</span>
+        <span class="nav-title">分销推广</span>
+        <span class="nav-right" onclick="showToast('📊 推广数据')">📊</span>
+      </div>
+      <div class="page-body">
+
+        <div class="dist-hero">
+          <div class="dist-title">🚀 推三免一</div>
+          <div class="dist-sub">推荐3位好友购买，你免费获得1件！还有额外佣金奖励</div>
+          <div class="dist-stats">
+            <div class="dist-stat">
+              <div class="dist-stat-num" id="distRefCount">1</div>
+              <div class="dist-stat-lbl">已推荐</div>
+            </div>
+            <div class="dist-stat">
+              <div class="dist-stat-num">¥58.5</div>
+              <div class="dist-stat-lbl">累计佣金</div>
+            </div>
+            <div class="dist-stat">
+              <div class="dist-stat-num">¥39.9</div>
+              <div class="dist-stat-lbl">待免商品</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="refer-card">
+          <div class="row" style="justify-content:space-between;margin-bottom:8px">
+            <span class="bold" style="font-size:14px">🎯 推三免一进度</span>
+            <span class="text-sm text-red bold" id="distProgress">1/3 人</span>
+          </div>
+          <div class="progress-bar refer-progress">
+            <div class="progress-fill" id="distProgFill" style="width:33%"></div>
+          </div>
+          <div style="display:flex;gap:8px;margin:10px 0">
+            <div class="refer-bubble done">😊</div>
+            <div class="refer-bubble active">❓</div>
+            <div class="refer-bubble todo">❓</div>
+            <div style="width:36px;height:36px;border-radius:50%;background:var(--red);display:flex;align-items:center;justify-content:center;font-size:20px;color:#fff;font-weight:800">🎁</div>
+          </div>
+          <div style="font-size:12px;color:var(--text3);margin-bottom:12px">好友1已下单 ✅ &nbsp; 好友2待邀请 ⏳ &nbsp; 好友3待邀请 ⏳</div>
+          <button class="btn btn-primary btn-block" onclick="simulateInvite()">📲 立即分享专属链接</button>
+        </div>
+
+        <div class="section-hd"><span class="section-title">💰 佣金明细</span></div>
+        <div class="commission-list">
+          <div class="commission-item">
+            <div class="comm-avatar">👩</div>
+            <div class="comm-info">
+              <div class="comm-name">好友：李**</div>
+              <div class="comm-time">2026-05-15 购买了 红枣枸杞养生茶</div>
+            </div>
+            <div class="col" style="align-items:flex-end">
+              <span class="comm-amount">+¥19.95</span>
+              <span class="badge badge-green" style="margin-top:4px">已入账</span>
+            </div>
+          </div>
+          <div class="commission-item">
+            <div class="comm-avatar">👦</div>
+            <div class="comm-info">
+              <div class="comm-name">好友：王**</div>
+              <div class="comm-time">2026-04-28 购买了 山药薏米代餐粉</div>
+            </div>
+            <div class="col" style="align-items:flex-end">
+              <span class="comm-amount">+¥24.95</span>
+              <span class="badge badge-green" style="margin-top:4px">已入账</span>
+            </div>
+          </div>
+          <div class="commission-item">
+            <div class="comm-avatar">👧</div>
+            <div class="comm-info">
+              <div class="comm-name">好友：陈**</div>
+              <div class="comm-time">2026-04-10 购买了 云南百花野生蜜</div>
+            </div>
+            <div class="col" style="align-items:flex-end">
+              <span class="comm-amount">+¥13.6</span>
+              <span class="badge badge-blue" style="margin-top:4px">待结算</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="section-hd" style="margin-top:8px"><span class="section-title">🏆 推广排行榜</span></div>
+        <div class="leaderboard">
+          <div class="lb-item">
+            <div class="lb-rank gold">1</div>
+            <span class="lb-avatar">🧑</span>
+            <div class="lb-info">
+              <div class="lb-name">推广达人：赵**</div>
+              <div class="lb-num">已推荐 47 人</div>
+            </div>
+            <span class="lb-earn">¥1,840</span>
+          </div>
+          <div class="lb-item">
+            <div class="lb-rank silver">2</div>
+            <span class="lb-avatar">👩</span>
+            <div class="lb-info">
+              <div class="lb-name">推广能手：刘**</div>
+              <div class="lb-num">已推荐 31 人</div>
+            </div>
+            <span class="lb-earn">¥1,230</span>
+          </div>
+          <div class="lb-item">
+            <div class="lb-rank bronze">3</div>
+            <span class="lb-avatar">🧓</span>
+            <div class="lb-info">
+              <div class="lb-name">活跃用户：孙**</div>
+              <div class="lb-num">已推荐 22 人</div>
+            </div>
+            <span class="lb-earn">¥880</span>
+          </div>
+          <div class="lb-item">
+            <div class="lb-rank other">8</div>
+            <span class="lb-avatar">👨</span>
+            <div class="lb-info">
+              <div class="lb-name">我（张小明）</div>
+              <div class="lb-num">已推荐 <span id="myRefNum">1</span> 人</div>
+            </div>
+            <span class="lb-earn" id="myEarn">¥58.5</span>
+          </div>
+        </div>
+        <div style="height:10px"></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+<div class="frame-label">📱 客户端</div>
+</div>
+
+<!-- ============================================================
+     PHONE 2: 后台管理 (Admin Side)
+============================================================ -->
+<div>
+<div class="phone" id="phone-admin">
+  <div class="phone-screen">
+    <div class="status-bar" style="background:#1A1A2E">
+      <span>12:08</span><span>🔋 78%</span>
+    </div>
+
+    <!-- ===== ADMIN HOME ===== -->
+    <div class="page active" id="page-admin-home">
+      <div class="admin-header">
+        <div class="admin-greeting">管理员，你好 👋</div>
+        <div class="admin-name">推三免一商城 · 后台</div>
+        <div class="admin-date">2026年5月16日 星期六</div>
+      </div>
+      <div class="page-body">
+
+        <div class="data-cards">
+          <div class="data-card" onclick="goAdminPage('page-admin-orders')">
+            <div class="data-card-icon">🛒</div>
+            <div class="data-card-num">1,284</div>
+            <div class="data-card-label">今日订单数</div>
+            <div class="data-card-trend trend-up">↑ 23.5% 较昨日</div>
+          </div>
+          <div class="data-card" onclick="showToast('💰 今日营业额详情')">
+            <div class="data-card-icon">💰</div>
+            <div class="data-card-num">¥48,320</div>
+            <div class="data-card-label">今日营业额</div>
+            <div class="data-card-trend trend-up">↑ 18.2% 较昨日</div>
+          </div>
+          <div class="data-card" onclick="goAdminPage('page-admin-member')">
+            <div class="data-card-icon">👥</div>
+            <div class="data-card-num">8,932</div>
+            <div class="data-card-label">总会员数</div>
+            <div class="data-card-trend trend-up">↑ 156 今日新增</div>
+          </div>
+          <div class="data-card" onclick="goAdminPage('page-admin-dist')">
+            <div class="data-card-icon">📢</div>
+            <div class="data-card-num">2,341</div>
+            <div class="data-card-label">活跃推广员</div>
+            <div class="data-card-trend trend-up">↑ 89 今日新增</div>
+          </div>
+        </div>
+
+        <div class="chart-card">
+          <div class="chart-title">📊 近7日销售额（万元）</div>
+          <div class="bar-chart" id="adminChart"></div>
+        </div>
+
+        <div class="admin-nav">
+          <div class="admin-nav-item" onclick="goAdminPage('page-admin-orders')">
+            <div class="admin-nav-icon" style="background:#FFEBEE">🛒</div>
+            <div class="admin-nav-info">
+              <div class="admin-nav-title">订单管理</div>
+              <div class="admin-nav-desc">查看、处理、退款 · 待处理 23 单</div>
+            </div>
+            <span class="admin-nav-arrow">›</span>
+          </div>
+          <div class="admin-nav-item" onclick="goAdminPage('page-admin-member')">
+            <div class="admin-nav-icon" style="background:#E3F2FD">👥</div>
+            <div class="admin-nav-info">
+              <div class="admin-nav-title">会员管理</div>
+              <div class="admin-nav-desc">等级设置、积分管理、黑名单</div>
+            </div>
+            <span class="admin-nav-arrow">›</span>
+          </div>
+          <div class="admin-nav-item" onclick="goAdminPage('page-admin-dist')">
+            <div class="admin-nav-icon" style="background:#E8F5E9">📢</div>
+            <div class="admin-nav-info">
+              <div class="admin-nav-title">分销管理</div>
+              <div class="admin-nav-desc">推广员、佣金规则、提现审核</div>
+            </div>
+            <span class="admin-nav-arrow">›</span>
+          </div>
+          <div class="admin-nav-item" onclick="goAdminPage('page-admin-deco')">
+            <div class="admin-nav-icon" style="background:#FFF8E1">🎨</div>
+            <div class="admin-nav-info">
+              <div class="admin-nav-title">页面装修</div>
+              <div class="admin-nav-desc">拖拽式设计，实时预览</div>
+            </div>
+            <span class="admin-nav-arrow">›</span>
+          </div>
+          <div class="admin-nav-item" onclick="showToast('📦 商品管理模块')">
+            <div class="admin-nav-icon" style="background:#FCE4EC">📦</div>
+            <div class="admin-nav-info">
+              <div class="admin-nav-title">商品管理</div>
+              <div class="admin-nav-desc">上架下架、库存、定价管理</div>
+            </div>
+            <span class="admin-nav-arrow">›</span>
+          </div>
+          <div class="admin-nav-item" onclick="showToast('📊 数据报表导出')">
+            <div class="admin-nav-icon" style="background:#F3E5F5">📊</div>
+            <div class="admin-nav-info">
+              <div class="admin-nav-title">数据报表</div>
+              <div class="admin-nav-desc">销售分析、用户画像、趋势图</div>
+            </div>
+            <span class="admin-nav-arrow">›</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ===== ADMIN: ORDERS ===== -->
+    <div class="page" id="page-admin-orders">
+      <div class="nav-bar" style="background:#1A1A2E">
+        <span class="nav-back" onclick="goAdminPage('page-admin-home')">←</span>
+        <span class="nav-title">订单管理</span>
+        <span class="nav-right" onclick="showToast('🔍 搜索订单')">🔍</span>
+      </div>
+      <div class="page-body">
+        <div class="order-tabs">
+          <div class="order-tab active" onclick="switchOrderTab(this,'全部')">全部</div>
+          <div class="order-tab" onclick="switchOrderTab(this,'待发货')">待发货<span style="color:var(--red);font-weight:700">(23)</span></div>
+          <div class="order-tab" onclick="switchOrderTab(this,'运输中')">运输中</div>
+          <div class="order-tab" onclick="switchOrderTab(this,'已完成')">已完成</div>
+        </div>
+
+        <div style="padding:8px;background:var(--white);margin-bottom:8px">
+          <div class="row gap8">
+            <input type="text" placeholder="搜索订单号/用户名" style="flex:1;padding:8px 12px;border:0.5px solid var(--border);border-radius:var(--radius-sm);font-size:13px;background:var(--bg)">
+            <button class="btn btn-primary btn-sm" onclick="showToast('🔍 搜索中...')">搜索</button>
+          </div>
+        </div>
+
+        <div style="background:var(--white);margin-bottom:8px">
+          <div style="padding:12px 14px;border-bottom:0.5px solid var(--border)">
+            <div class="row" style="justify-content:space-between;margin-bottom:6px">
+              <div class="row gap8">
+                <span class="text-xs text-gray">NO.2026051600001</span>
+                <span class="badge badge-red">待发货</span>
+              </div>
+              <span class="text-xs text-gray">05-16 10:32</span>
+            </div>
+            <div class="row gap8" style="margin-bottom:8px">
+              <span style="font-size:28px">🫖</span>
+              <div class="col flex1">
+                <span class="text-sm bold">红枣枸杞养生茶×2</span>
+                <span class="text-xs text-gray">买家：张** &nbsp; 手机：138****1234</span>
+              </div>
+              <span class="price">¥93.12</span>
+            </div>
+            <div class="row gap8" style="justify-content:flex-end">
+              <button class="btn btn-sm btn-ghost" onclick="showToast('📋 订单详情')">详情</button>
+              <button class="btn btn-sm btn-primary" onclick="shipOrder(this)">发货</button>
+            </div>
+          </div>
+          <div style="padding:12px 14px;border-bottom:0.5px solid var(--border)">
+            <div class="row" style="justify-content:space-between;margin-bottom:6px">
+              <div class="row gap8">
+                <span class="text-xs text-gray">NO.2026051600002</span>
+                <span class="badge badge-red">待发货</span>
+              </div>
+              <span class="text-xs text-gray">05-16 09:45</span>
+            </div>
+            <div class="row gap8" style="margin-bottom:8px">
+              <span style="font-size:28px">🍯</span>
+              <div class="col flex1">
+                <span class="text-sm bold">云南百花野生蜜×1</span>
+                <span class="text-xs text-gray">买家：李** &nbsp; 手机：139****5678</span>
+              </div>
+              <span class="price">¥68</span>
+            </div>
+            <div class="row gap8" style="justify-content:flex-end">
+              <button class="btn btn-sm btn-ghost" onclick="showToast('📋 订单详情')">详情</button>
+              <button class="btn btn-sm btn-primary" onclick="shipOrder(this)">发货</button>
+            </div>
+          </div>
+          <div style="padding:12px 14px">
+            <div class="row" style="justify-content:space-between;margin-bottom:6px">
+              <div class="row gap8">
+                <span class="text-xs text-gray">NO.2026051600003</span>
+                <span class="badge badge-green">已发货</span>
+              </div>
+              <span class="text-xs text-gray">05-15 16:20</span>
+            </div>
+            <div class="row gap8" style="margin-bottom:8px">
+              <span style="font-size:28px">🌾</span>
+              <div class="col flex1">
+                <span class="text-sm bold">山药薏米代餐粉×3</span>
+                <span class="text-xs text-gray">买家：王** &nbsp; 手机：137****9012</span>
+              </div>
+              <span class="price">¥149.7</span>
+            </div>
+            <div class="row gap8" style="justify-content:flex-end">
+              <button class="btn btn-sm btn-ghost" onclick="showToast('📋 订单详情')">详情</button>
+              <button class="btn btn-sm" style="background:var(--bg);color:var(--text2);border:0.5px solid var(--border);border-radius:16px;padding:6px 14px;font-size:12px" onclick="showToast('SF1234567890')">物流单号</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== ADMIN: MEMBER ===== -->
+    <div class="page" id="page-admin-member">
+      <div class="nav-bar" style="background:#1A1A2E">
+        <span class="nav-back" onclick="goAdminPage('page-admin-home')">←</span>
+        <span class="nav-title">会员管理</span>
+        <span class="nav-right" onclick="showToast('➕ 新增会员')">➕</span>
+      </div>
+      <div class="page-body">
+
+        <div class="data-cards">
+          <div class="data-card">
+            <div class="data-card-icon">👥</div>
+            <div class="data-card-num">8,932</div>
+            <div class="data-card-label">总会员</div>
+          </div>
+          <div class="data-card">
+            <div class="data-card-icon">👑</div>
+            <div class="data-card-num">1,234</div>
+            <div class="data-card-label">黄金+</div>
+          </div>
+          <div class="data-card">
+            <div class="data-card-icon">⭐</div>
+            <div class="data-card-num">3,456</div>
+            <div class="data-card-label">白银会员</div>
+          </div>
+          <div class="data-card">
+            <div class="data-card-icon">🆕</div>
+            <div class="data-card-num">4,242</div>
+            <div class="data-card-label">普通会员</div>
+          </div>
+        </div>
+
+        <div style="background:var(--white);margin-bottom:8px">
+          <div class="section-hd"><span class="section-title">⚙️ 等级规则设置</span></div>
+          <div style="padding:0 14px 14px">
+            <div style="background:var(--bg);border-radius:var(--radius-sm);padding:12px;margin-bottom:8px">
+              <div class="row" style="justify-content:space-between;margin-bottom:4px">
+                <span class="bold text-sm">🥉 普通会员</span>
+                <button class="btn btn-sm" style="background:var(--white);color:var(--text2);border:0.5px solid var(--border);font-size:11px;border-radius:12px;padding:4px 10px" onclick="showToast('编辑普通会员规则')">编辑</button>
+              </div>
+              <div class="text-xs text-gray">积分 0-999 · 无折扣 · 运费8元</div>
+            </div>
+            <div style="background:var(--bg);border-radius:var(--radius-sm);padding:12px;margin-bottom:8px">
+              <div class="row" style="justify-content:space-between;margin-bottom:4px">
+                <span class="bold text-sm">🥈 白银会员</span>
+                <button class="btn btn-sm" style="background:var(--white);color:var(--text2);border:0.5px solid var(--border);font-size:11px;border-radius:12px;padding:4px 10px" onclick="showToast('编辑白银会员规则')">编辑</button>
+              </div>
+              <div class="text-xs text-gray">积分 1000-1999 · 95折 · 包邮</div>
+            </div>
+            <div style="background:var(--red-light);border-radius:var(--radius-sm);padding:12px;margin-bottom:8px;border:1px solid #FFCDD2">
+              <div class="row" style="justify-content:space-between;margin-bottom:4px">
+                <span class="bold text-sm text-red">👑 黄金会员</span>
+                <button class="btn btn-sm" style="background:var(--white);color:var(--red);border:0.5px solid var(--red);font-size:11px;border-radius:12px;padding:4px 10px" onclick="showToast('编辑黄金会员规则')">编辑</button>
+              </div>
+              <div class="text-xs" style="color:var(--red-dark)">积分 2000+ · 9折 · 包邮 · 积分×2 · 专属客服</div>
+            </div>
+          </div>
+        </div>
+
+        <div style="background:var(--white);margin-bottom:8px">
+          <div class="section-hd">
+            <span class="section-title">👥 会员列表</span>
+            <button class="btn btn-sm" style="background:var(--bg);color:var(--text2);border:0.5px solid var(--border);font-size:11px;border-radius:12px;padding:4px 12px" onclick="showToast('🔍 搜索会员')">搜索</button>
+          </div>
+          <div>
+            <div class="commission-item">
+              <div class="comm-avatar">👨</div>
+              <div class="comm-info">
+                <div class="comm-name">张小明 <span class="badge badge-red">黄金</span></div>
+                <div class="comm-time">积分:1280 · 订单:12 · 消费:¥1,456</div>
+              </div>
+              <button class="btn btn-sm btn-ghost" onclick="showToast('张小明会员详情')">详情</button>
+            </div>
+            <div class="commission-item">
+              <div class="comm-avatar">👩</div>
+              <div class="comm-info">
+                <div class="comm-name">李小花 <span class="badge" style="background:#E0E0E0;color:#616161">白银</span></div>
+                <div class="comm-time">积分:860 · 订单:5 · 消费:¥634</div>
+              </div>
+              <button class="btn btn-sm btn-ghost" onclick="showToast('李小花会员详情')">详情</button>
+            </div>
+            <div class="commission-item">
+              <div class="comm-avatar">🧑</div>
+              <div class="comm-info">
+                <div class="comm-name">王大锤 <span class="badge" style="background:#E8F5E9;color:#2E7D32">普通</span></div>
+                <div class="comm-time">积分:210 · 订单:2 · 消费:¥148</div>
+              </div>
+              <button class="btn btn-sm btn-ghost" onclick="showToast('王大锤会员详情')">详情</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ===== ADMIN: DISTRIBUTION ===== -->
+    <div class="page" id="page-admin-dist">
+      <div class="nav-bar" style="background:#1A1A2E">
+        <span class="nav-back" onclick="goAdminPage('page-admin-home')">←</span>
+        <span class="nav-title">分销管理</span>
+        <span class="nav-right" onclick="showToast('⚙️ 分销规则配置')">⚙️</span>
+      </div>
+      <div class="page-body">
+
+        <div class="data-cards">
+          <div class="data-card">
+            <div class="data-card-icon">📢</div>
+            <div class="data-card-num">2,341</div>
+            <div class="data-card-label">推广员总数</div>
+          </div>
+          <div class="data-card">
+            <div class="data-card-icon">💸</div>
+            <div class="data-card-num">¥12,430</div>
+            <div class="data-card-label">待结算佣金</div>
+          </div>
+          <div class="data-card">
+            <div class="data-card-icon">✅</div>
+            <div class="data-card-num">¥89,320</div>
+            <div class="data-card-label">累计已结算</div>
+          </div>
+          <div class="data-card">
+            <div class="data-card-icon">🎁</div>
+            <div class="data-card-num">456</div>
+            <div class="data-card-label">免单次数</div>
+          </div>
+        </div>
+
+        <div style="background:var(--white);margin:8px;border-radius:var(--radius);padding:14px;box-shadow:var(--shadow)">
+          <div class="bold text-sm" style="margin-bottom:12px">⚙️ 推三免一规则配置</div>
+          <div style="margin-bottom:10px">
+            <div class="text-xs text-gray" style="margin-bottom:4px">触发条件（推荐人数）</div>
+            <div class="row gap8">
+              <input type="number" value="3" min="1" max="10" style="width:60px;padding:6px;border:0.5px solid var(--border);border-radius:var(--radius-sm);font-size:14px;text-align:center">
+              <span class="text-sm text-gray">位好友成功购买 → 免费获得1件</span>
+            </div>
+          </div>
+          <div style="margin-bottom:10px">
+            <div class="text-xs text-gray" style="margin-bottom:4px">推荐佣金比例</div>
+            <div class="row gap8">
+              <input type="number" value="5" min="1" max="30" style="width:60px;padding:6px;border:0.5px solid var(--border);border-radius:var(--radius-sm);font-size:14px;text-align:center">
+              <span class="text-sm text-gray">% 每单佣金</span>
+            </div>
+          </div>
+          <div style="margin-bottom:12px">
+            <div class="text-xs text-gray" style="margin-bottom:4px">最低提现金额</div>
+            <div class="row gap8">
+              <span style="font-size:14px;color:var(--text2)">¥</span>
+              <input type="number" value="50" style="width:80px;padding:6px;border:0.5px solid var(--border);border-radius:var(--radius-sm);font-size:14px">
+            </div>
+          </div>
+          <button class="btn btn-primary btn-block" onclick="showToast('✅ 规则配置已保存')">保存配置</button>
+        </div>
+
+        <div style="background:var(--white);margin-bottom:8px">
+          <div class="section-hd">
+            <span class="section-title">💸 提现审核</span>
+            <span class="badge badge-red">3 待审核</span>
+          </div>
+          <div class="commission-item">
+            <div class="comm-avatar">🧑</div>
+            <div class="comm-info">
+              <div class="comm-name">赵**</div>
+              <div class="comm-time">申请提现 ¥500 · 微信收款</div>
+            </div>
+            <div class="row gap6">
+              <button class="btn btn-sm" style="background:var(--green-light);color:var(--green);border:none;border-radius:12px;padding:5px 10px;font-size:11px" onclick="showToast('✅ 已通过，自动打款')">通过</button>
+              <button class="btn btn-sm" style="background:var(--red-light);color:var(--red);border:none;border-radius:12px;padding:5px 10px;font-size:11px" onclick="showToast('❌ 已拒绝')">拒绝</button>
+            </div>
+          </div>
+          <div class="commission-item">
+            <div class="comm-avatar">👩</div>
+            <div class="comm-info">
+              <div class="comm-name">刘**</div>
+              <div class="comm-time">申请提现 ¥230 · 支付宝收款</div>
+            </div>
+            <div class="row gap6">
+              <button class="btn btn-sm" style="background:var(--green-light);color:var(--green);border:none;border-radius:12px;padding:5px 10px;font-size:11px" onclick="showToast('✅ 已通过，自动打款')">通过</button>
+              <button class="btn btn-sm" style="background:var(--red-light);color:var(--red);border:none;border-radius:12px;padding:5px 10px;font-size:11px" onclick="showToast('❌ 已拒绝')">拒绝</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ===== ADMIN: DECORATION ===== -->
+    <div class="page" id="page-admin-deco">
+      <div class="nav-bar" style="background:#1A1A2E">
+        <span class="nav-back" onclick="goAdminPage('page-admin-home')">←</span>
+        <span class="nav-title">🎨 页面装修</span>
+        <span class="nav-right" onclick="publishDeco()">发布</span>
+      </div>
+
+      <div class="deco-toolbar">
+        <div class="deco-tool active" onclick="switchDecoTool(this,'组件库')">组件库</div>
+        <div class="deco-tool" onclick="switchDecoTool(this,'样式')">样式</div>
+        <div class="deco-tool" onclick="switchDecoTool(this,'数据')">数据</div>
+        <div class="deco-tool" onclick="switchDecoTool(this,'预览')">预览</div>
+      </div>
+
+      <div class="deco-canvas" id="decoCanvas">
+        <div class="deco-component selected" id="deco-banner" onclick="selectDecoComp(this)">
+          <span class="deco-component-label">Banner轮播</span>
+          <div class="deco-component-actions">
+            <button class="deco-action-btn" onclick="event.stopPropagation();moveDecoComp(this,'up')">↑</button>
+            <button class="deco-action-btn" onclick="event.stopPropagation();moveDecoComp(this,'down')">↓</button>
+            <button class="deco-action-btn" onclick="event.stopPropagation();removeDecoComp(this)" style="background:rgba(211,47,47,0.7)">✕</button>
+          </div>
+          <div class="deco-banner-preview">🔥 推三免一限时活动</div>
+        </div>
+
+        <div class="deco-component" id="deco-notice" onclick="selectDecoComp(this)">
+          <span class="deco-component-label">公告栏</span>
+          <div class="deco-component-actions">
+            <button class="deco-action-btn" onclick="event.stopPropagation();moveDecoComp(this,'up')">↑</button>
+            <button class="deco-action-btn" onclick="event.stopPropagation();moveDecoComp(this,'down')">↓</button>
+            <button class="deco-action-btn" onclick="event.stopPropagation();removeDecoComp(this)" style="background:rgba(211,47,47,0.7)">✕</button>
+          </div>
+          <div class="deco-notice-preview">📢 推荐3位好友，即可免费获得同款商品！</div>
+        </div>
+
+        <div class="deco-component" id="deco-grid" onclick="selectDecoComp(this)">
+          <span class="deco-component-label">功能导航</span>
+          <div class="deco-component-actions">
+            <button class="deco-action-btn" onclick="event.stopPropagation();moveDecoComp(this,'up')">↑</button>
+            <button class="deco-action-btn" onclick="event.stopPropagation();moveDecoComp(this,'down')">↓</button>
+            <button class="deco-action-btn" onclick="event.stopPropagation();removeDecoComp(this)" style="background:rgba(211,47,47,0.7)">✕</button>
+          </div>
+          <div class="deco-grid-preview">
+            <div class="deco-grid-icon"><div class="deco-grid-emoji">🛒</div><span class="deco-grid-lbl">下单</span></div>
+            <div class="deco-grid-icon"><div class="deco-grid-emoji">📦</div><span class="deco-grid-lbl">物流</span></div>
+            <div class="deco-grid-icon"><div class="deco-grid-emoji">👑</div><span class="deco-grid-lbl">会员</span></div>
+            <div class="deco-grid-icon"><div class="deco-grid-emoji">💰</div><span class="deco-grid-lbl">分销</span></div>
+          </div>
+        </div>
+
+        <div class="deco-component" id="deco-prod" onclick="selectDecoComp(this)">
+          <span class="deco-component-label">商品展示</span>
+          <div class="deco-component-actions">
+            <button class="deco-action-btn" onclick="event.stopPropagation();moveDecoComp(this,'up')">↑</button>
+            <button class="deco-action-btn" onclick="event.stopPropagation();moveDecoComp(this,'down')">↓</button>
+            <button class="deco-action-btn" onclick="event.stopPropagation();removeDecoComp(this)" style="background:rgba(211,47,47,0.7)">✕</button>
+          </div>
+          <div class="deco-prod-preview">
+            <div class="deco-prod-item"><span style="font-size:28px">🫖</span></div>
+            <div class="deco-prod-item"><span style="font-size:28px">🍯</span></div>
+            <div class="deco-prod-item"><span style="font-size:28px">🌾</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="deco-panel">
+        <div class="deco-panel-title">➕ 点击添加组件</div>
+        <div class="comp-palette">
+          <div class="comp-tile" onclick="addDecoComp('banner','Banner')">
+            <span class="comp-tile-icon">🖼️</span>Banner
+          </div>
+          <div class="comp-tile" onclick="addDecoComp('notice','公告')">
+            <span class="comp-tile-icon">📢</span>公告栏
+          </div>
+          <div class="comp-tile" onclick="addDecoComp('grid','导航')">
+            <span class="comp-tile-icon">🧱</span>导航栏
+          </div>
+          <div class="comp-tile" onclick="addDecoComp('prod','商品')">
+            <span class="comp-tile-icon">📦</span>商品组
+          </div>
+          <div class="comp-tile" onclick="addDecoComp('countdown','倒计时')">
+            <span class="comp-tile-icon">⏰</span>倒计时
+          </div>
+          <div class="comp-tile" onclick="addDecoComp('divider','分隔')">
+            <span class="comp-tile-icon">➖</span>分隔线
+          </div>
+          <div class="comp-tile" onclick="addDecoComp('text','文字')">
+            <span class="comp-tile-icon">✏️</span>富文本
+          </div>
+          <div class="comp-tile" onclick="addDecoComp('coupon','优惠券')">
+            <span class="comp-tile-icon">🎫</span>优惠券
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+<div class="frame-label">🖥️ 后台管理端</div>
+</div>
+
+</div><!-- end app-frame -->
+
+<!-- ===== MODALS ===== -->
+<div class="modal-mask" id="productModal" onclick="closeModal('productModal')">
+  <div class="modal-box" onclick="event.stopPropagation()">
+    <div class="modal-title" id="modalProductName">商品详情</div>
+    <div style="text-align:center;font-size:80px;margin:10px 0" id="modalProductEmoji">🫖</div>
+    <div class="row gap8" style="justify-content:center;margin-bottom:8px">
+      <span class="price-lg" id="modalProductPrice">¥39.9</span>
+      <span class="orig-price" id="modalProductOrig">¥58</span>
+    </div>
+    <div class="text-xs text-gray" style="text-align:center;margin-bottom:16px" id="modalProductSales">已售2831件</div>
+    <div style="background:var(--red-light);border-radius:var(--radius-sm);padding:10px;margin-bottom:16px">
+      <div class="bold text-sm text-red" style="margin-bottom:4px">🎯 推三免一活动商品</div>
+      <div class="text-xs" style="color:var(--red-dark)">推荐3位好友购买此商品，下次购买您可免费获得1件</div>
+    </div>
+    <div class="row gap8">
+      <button class="btn btn-ghost flex1" onclick="closeModal('productModal')">取消</button>
+      <button class="btn btn-primary flex1" onclick="addToCartFromModal()">加入购物车</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-mask" id="cartModal" onclick="closeModal('cartModal')">
+  <div class="modal-box" onclick="event.stopPropagation()">
+    <div class="modal-title">🛒 购物车</div>
+    <div id="cartList" style="margin-bottom:16px;max-height:200px;overflow-y:auto"></div>
+    <div class="row" style="justify-content:space-between;margin-bottom:12px">
+      <span class="text-sm text-gray">合计</span>
+      <span class="price-lg" id="cartTotal">¥0</span>
+    </div>
+    <button class="btn btn-primary btn-block" onclick="closeModal('cartModal');goPage('page-order')">去结算</button>
+  </div>
+</div>
+
+<script>
+// ===== STATE =====
+let cartItems = [];
+let cartCount = 0;
+let inviteCount = 1;
+let currentModalProduct = null;
+
+// ===== NAVIGATION =====
+function goPage(id) {
+  document.querySelectorAll('#phone-customer .page').forEach(p=>p.classList.remove('active'));
+  const el = document.getElementById(id);
+  if(el) el.classList.add('active');
+}
+function goAdminPage(id) {
+  document.querySelectorAll('#phone-admin .page').forEach(p=>p.classList.remove('active'));
+  const el = document.getElementById(id);
+  if(el) el.classList.add('active');
+}
+
+// ===== TOAST =====
+let toastTimer;
+function showToast(msg, duration) {
+  clearTimeout(toastTimer);
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.display = 'block';
+  toastTimer = setTimeout(()=>t.style.display='none', duration||2200);
+}
+
+// ===== MODAL =====
+function closeModal(id) {
+  document.getElementById(id).classList.remove('show');
+}
+
+// ===== PRODUCT MODAL =====
+function openProductModal(name, emoji, price, orig, sales) {
+  currentModalProduct = {name, emoji, price, orig, sales};
+  document.getElementById('modalProductName').textContent = name;
+  document.getElementById('modalProductEmoji').textContent = emoji;
+  document.getElementById('modalProductPrice').textContent = '¥'+price;
+  document.getElementById('modalProductOrig').textContent = '¥'+orig;
+  document.getElementById('modalProductSales').textContent = sales;
+  document.getElementById('productModal').classList.add('show');
+}
+function addToCartFromModal() {
+  if(!currentModalProduct) return;
+  addToCart(currentModalProduct.name, parseFloat(currentModalProduct.price));
+  closeModal('productModal');
+}
+
+// ===== CART =====
+function addToCart(name, price) {
+  const existing = cartItems.find(i=>i.name===name);
+  if(existing) { existing.qty++; }
+  else { cartItems.push({name, price, qty:1}); }
+  cartCount++;
+  document.getElementById('cartBadge').textContent = cartCount;
+  showToast('🛒 已加入购物车：'+name);
+}
+function openCartModal() {
+  const list = document.getElementById('cartList');
+  if(cartItems.length===0) {
+    list.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text3)">购物车空空如也 🛒</div>';
+    document.getElementById('cartTotal').textContent = '¥0';
+  } else {
+    let total = 0;
+    list.innerHTML = cartItems.map(i=>{
+      total += i.price * i.qty;
+      return `<div class="row gap8" style="padding:8px 0;border-bottom:0.5px solid var(--border)">
+        <div class="flex1 bold text-sm">${i.name}</div>
+        <span class="text-xs text-gray">×${i.qty}</span>
+        <span class="price">¥${(i.price*i.qty).toFixed(1)}</span>
+      </div>`;
+    }).join('');
+    document.getElementById('cartTotal').textContent = '¥'+total.toFixed(1);
+  }
+  document.getElementById('cartModal').classList.add('show');
+}
+
+// ===== ORDER =====
+function changeQty(btn, delta) {
+  const numEl = btn.parentNode.querySelector('.qty-num');
+  let n = parseInt(numEl.textContent) + delta;
+  if(n < 1) n = 1;
+  numEl.textContent = n;
+}
+function placeOrder() {
+  showToast('🎉 订单提交成功！正在跳转支付...', 2500);
+  setTimeout(()=>goPage('page-track'), 2000);
+}
+function shipOrder(btn) {
+  const row = btn.closest('[style*="padding:12px"]') || btn.closest('div');
+  btn.textContent = '已发货';
+  btn.style.background = 'var(--green)';
+  btn.style.cursor = 'default';
+  btn.onclick = null;
+  showToast('📦 发货成功！顺丰速运，单号 SF'+(Math.floor(Math.random()*9000000000)+1000000000));
+}
+
+// ===== DISTRIBUTION =====
+function simulateInvite() {
+  showToast('🔗 专属链接已复制，快去分享！');
+  setTimeout(()=>{
+    if(inviteCount < 3) {
+      inviteCount++;
+      const pct = Math.round(inviteCount/3*100);
+      document.getElementById('distRefCount').textContent = inviteCount;
+      document.getElementById('distProgress').textContent = inviteCount+'/3 人';
+      document.getElementById('distProgFill').style.width = pct+'%';
+      document.getElementById('homeProgFill').style.width = pct+'%';
+      document.getElementById('myRefNum').textContent = inviteCount;
+      document.getElementById('homeProgLbl').textContent = '已推荐 '+inviteCount+'/3 人'+(inviteCount<3?'，再邀请 '+(3-inviteCount)+' 人即可免费！':'，🎉 恭喜达成免单！');
+      if(inviteCount===3) {
+        document.getElementById('myEarn').textContent = '¥97.85';
+        setTimeout(()=>showToast('🎉 恭喜！已推荐3位好友，免费商品正在安排发货！',3000),800);
+      } else {
+        setTimeout(()=>showToast('✅ 好友下单成功！还差 '+(3-inviteCount)+' 人即可免费！',2500),1500);
+      }
+    } else {
+      showToast('🎁 已完成推三免一！继续推荐可获更多佣金');
+    }
+  }, 1800);
+}
+
+// ===== TABS =====
+function switchOrderTab(el, name) {
+  el.closest('.order-tabs').querySelectorAll('.order-tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  showToast('📋 '+name+'订单');
+}
+
+// ===== DECO =====
+let selectedDecoComp = null;
+let decoCompCounter = 5;
+
+function selectDecoComp(el) {
+  document.querySelectorAll('.deco-component').forEach(c=>c.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedDecoComp = el;
+}
+
+const decoTemplates = {
+  banner: `<div class="deco-banner-preview">🖼️ 自定义Banner</div>`,
+  notice: `<div class="deco-notice-preview">📢 自定义公告内容</div>`,
+  grid: `<div class="deco-grid-preview">
+    <div class="deco-grid-icon"><div class="deco-grid-emoji">🛒</div><span class="deco-grid-lbl">下单</span></div>
+    <div class="deco-grid-icon"><div class="deco-grid-emoji">📦</div><span class="deco-grid-lbl">物流</span></div>
+    <div class="deco-grid-icon"><div class="deco-grid-emoji">👑</div><span class="deco-grid-lbl">会员</span></div>
+    <div class="deco-grid-icon"><div class="deco-grid-emoji">💰</div><span class="deco-grid-lbl">分销</span></div>
+  </div>`,
+  prod: `<div class="deco-prod-preview">
+    <div class="deco-prod-item"><span style="font-size:28px">📦</span></div>
+    <div class="deco-prod-item"><span style="font-size:28px">🛍️</span></div>
+    <div class="deco-prod-item"><span style="font-size:28px">🎁</span></div>
+  </div>`,
+  countdown: `<div style="background:#212121;color:#fff;padding:10px;text-align:center;font-size:13px;font-weight:700">⏰ 活动倒计时 &nbsp; <span style="background:var(--red);padding:3px 8px;border-radius:4px">05:23:59</span></div>`,
+  divider: `<div style="padding:8px 0"><div style="height:1px;background:var(--border)"></div></div>`,
+  text: `<div style="padding:12px;font-size:13px;color:var(--text2)">✏️ 点击编辑富文本内容...</div>`,
+  coupon: `<div style="background:linear-gradient(90deg,var(--red-light),#fff);padding:10px 14px;display:flex;align-items:center;gap:10px"><span style="font-size:22px">🎫</span><div><div style="font-size:13px;font-weight:700;color:var(--red)">满100减20优惠券</div><div style="font-size:11px;color:var(--text3)">限时领取，点击即可获得</div></div></div>`
+};
+
+const decoLabels = {banner:'Banner轮播',notice:'公告栏',grid:'功能导航',prod:'商品展示',countdown:'倒计时',divider:'分隔线',text:'富文本',coupon:'优惠券'};
+
+function addDecoComp(type, labelName) {
+  const canvas = document.getElementById('decoCanvas');
+  const id = 'deco-custom-'+decoCompCounter++;
+  const div = document.createElement('div');
+  div.className = 'deco-component';
+  div.id = id;
+  div.onclick = function(){selectDecoComp(this)};
+  div.innerHTML = `
+    <span class="deco-component-label">${decoLabels[type]||labelName}</span>
+    <div class="deco-component-actions">
+      <button class="deco-action-btn" onclick="event.stopPropagation();moveDecoComp(this,'up')">↑</button>
+      <button class="deco-action-btn" onclick="event.stopPropagation();moveDecoComp(this,'down')">↓</button>
+      <button class="deco-action-btn" onclick="event.stopPropagation();removeDecoComp(this)" style="background:rgba(211,47,47,0.7)">✕</button>
+    </div>
+    ${decoTemplates[type]||'<div style="padding:12px;color:var(--text3);font-size:12px">'+labelName+' 组件</div>'}
+  `;
+  canvas.appendChild(div);
+  selectDecoComp(div);
+  showToast('✅ 已添加：'+decoLabels[type]);
+}
+
+function removeDecoComp(btn) {
+  const comp = btn.closest('.deco-component');
+  comp.style.transition = 'opacity 0.2s, transform 0.2s';
+  comp.style.opacity = '0';
+  comp.style.transform = 'scale(0.95)';
+  setTimeout(()=>comp.remove(), 200);
+  showToast('🗑️ 已删除组件');
+}
+
+function moveDecoComp(btn, dir) {
+  const comp = btn.closest('.deco-component');
+  const canvas = document.getElementById('decoCanvas');
+  if(dir==='up' && comp.previousElementSibling) {
+    canvas.insertBefore(comp, comp.previousElementSibling);
+    showToast('⬆️ 已上移');
+  } else if(dir==='down' && comp.nextElementSibling) {
+    canvas.insertBefore(comp.nextElementSibling, comp);
+    showToast('⬇️ 已下移');
+  }
+}
+
+function switchDecoTool(el, name) {
+  document.querySelectorAll('.deco-tool').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  showToast('🎨 切换至：'+name);
+}
+
+function publishDeco() {
+  showToast('🚀 页面装修方案已发布上线！',2500);
+}
+
+// ===== ADMIN CHART =====
+function initAdminChart() {
+  const data = [3.2,2.8,4.1,3.9,5.2,4.8,6.1];
+  const labels = ['周一','周二','周三','周四','周五','周六','周日'];
+  const maxVal = Math.max(...data);
+  const chart = document.getElementById('adminChart');
+  chart.innerHTML = data.map((v,i)=>`
+    <div class="bar-wrap">
+      <div class="bar-val">${v}万</div>
+      <div class="bar" style="height:${Math.round(v/maxVal*70)}px;${i===6?'background:linear-gradient(180deg,var(--orange) 0%,#FFB74D 100%)':''}"></div>
+      <div class="bar-label">${labels[i]}</div>
+    </div>
+  `).join('');
+}
+
+// ===== INIT =====
+window.addEventListener('load', ()=>{
+  initAdminChart();
+});
+</script>
 </body>
 </html>
